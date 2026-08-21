@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Contact Sheet — Visual Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* warm tones for text sitting on the dark kraft background (topbar, menu, lightbox) */
+    --ink: #f2e6c8;
+    --ink-dim: #d3bd93;
+    --ink-faint: #a68a62;
+
+    /* tones for text sitting on the cream photo-card paper */
+    --paper: #f7edd3;
+    --paper-edge: #e3d1a6;
+    --paper-shadow-strong: #d9c493;
+    --paper-ink: #3a2a19;
+    --paper-ink-dim: #6b5137;
+    --paper-ink-faint: #8f7955;
+
+    --accent: #ad5330;
+    --accent-ink: #2a1c10;
+    --accent-soft: rgba(173,83,48,.42);
+
+    --glass: rgba(45,30,18,.58);
+    --glass-strong: rgba(27,18,10,.82);
+    --line: rgba(242,230,201,.16);
+    --card-line: rgba(58,42,26,.22);
+    --radius: 10px;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body{ height: 100%; }
+  body{
+    margin:0;
+    color: var(--ink);
+    font-family: 'Patrick Hand', cursive;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ---------- aesthetic background: hand-mixed kraft-paper warmth, no external image ---------- */
+  .bg{
+    position: fixed; inset:0; z-index:-2;
+    background-color: #6b4a30;
+    background-image: url('data:image/jpeg;base64,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');
+    background-repeat: repeat;
+    background-size: 520px 768px;
+  }
+  .bg-tint{
+    position: fixed; inset:0; z-index:-1;
+    background:
+      linear-gradient(180deg, rgba(20,13,7,.62) 0%, rgba(20,13,7,.18) 22%, rgba(20,13,7,.32) 78%, rgba(20,13,7,.72) 100%),
+      radial-gradient(120% 60% at 50% 0%, rgba(173,83,48,.10), transparent 60%);
+  }
+  .grain{
+    position: fixed; inset:0; pointer-events:none; z-index: 900; opacity: .06; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position: sticky; top:0; z-index: 60;
+    display:flex; align-items:center; gap: 12px;
+    padding: calc(14px + var(--safe-t)) 16px 12px;
+    background: linear-gradient(rgba(94,64,40,.72), rgba(94,64,40,.32) 80%, transparent);
+    backdrop-filter: blur(10px);
+  }
+  .burger{
+    flex-shrink:0;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2px dashed var(--ink-faint);
+    background: var(--glass);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    color: var(--ink);
+  }
+  .burger svg{ width: 22px; height: 22px; }
+
+  .topbar-titles{ flex:1; min-width:0; }
+  .topbar h1{
+    font-family: 'Caveat', cursive; font-weight: 700; font-size: 26px; margin:0;
+    line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .topbar h1{ letter-spacing: .01em; }
+  .topbar h1 em{ font-style: italic; color: var(--accent); }
+  .topbar .sub{
+    font-size: 10px; letter-spacing:.07em; text-transform:uppercase; color: var(--ink-faint);
+    margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .count-pill{
+    flex-shrink:0; font-size: 10px; color: var(--ink-dim);
+    border: 1px solid var(--line); background: var(--glass);
+    padding: 5px 10px; border-radius: 20px; white-space:nowrap;
+  }
+
+  /* ---------- filter chips (scrollable) ---------- */
+  .filters{
+    display:flex; gap: 8px; padding: 4px 16px 14px;
+    overflow-x: auto; scrollbar-width: none;
+    background: linear-gradient(rgba(27,18,10,.35), transparent);
+  }
+  .filters::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex-shrink:0;
+    font-family: 'Patrick Hand', cursive; font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-dim); background: var(--glass); border: 1px solid var(--line); border-radius: 20px;
+    padding: 8px 15px; white-space:nowrap;
+  }
+  .chip.active{ color: var(--accent-ink); background: var(--accent); border-color: var(--accent); font-weight:600; }
+
+  /* ---------- size row (photo template picker) ---------- */
+  .size-row{ display:flex; gap: 8px; padding: 0 16px 12px; }
+  .size-chip{
+    flex-shrink:0;
+    font-family: 'Patrick Hand', cursive; font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-dim); background: var(--glass); border: 1px solid var(--line); border-radius: 20px;
+    padding: 8px 15px; white-space:nowrap;
+  }
+  .size-chip.active{ color: var(--accent-ink); background: var(--accent); border-color: var(--accent); font-weight:600; }
+
+  /* ---------- grid ---------- */
+  main{ padding: 4px 12px calc(40px + var(--safe-b)); columns: 2 165px; column-gap: 10px; }
+
+  /* smallest photo template: 4 frames fill the row edge-to-edge */
+  main.size-4{ columns: 4; column-gap: 6px; }
+  main.size-4 .frame{ margin-bottom: 8px; border-radius: 7px; }
+  main.size-4 .frame::before{ width: 24px; height: 9px; top: -4px; left: 8px; }
+  main.size-4 .media-wrap{ padding: 4px 4px 0; }
+  main.size-4 .frame-foot{ padding: 5px 6px 6px; }
+  main.size-4 .foot-row .cap{ font-size: 10.5px; }
+  main.size-4 .desc-row, main.size-4 .edit-btn{ display:none; }
+
+  .frame{
+    position: relative;
+    break-inside: avoid; margin-bottom: 14px;
+    background: var(--frame-paper, var(--paper));
+    border: 1px solid var(--frame-edge, var(--paper-edge));
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 10px 22px -10px rgba(20,11,5,.55), 0 1px 0 rgba(255,255,255,.4) inset;
+    transition: transform .15s ease;
+  }
+  .frame:nth-child(4n+1){ transform: rotate(-.6deg); }
+  .frame:nth-child(4n+2){ transform: rotate(.5deg); }
+  .frame:nth-child(4n+3){ transform: rotate(.35deg); }
+  .frame:nth-child(4n+4){ transform: rotate(-.4deg); }
+  .frame:active{ transform: scale(.98); }
+  .frame.hidden{ display:none; }
+
+  /* little washi-tape accent, like it's pinned into a memory book */
+  .frame::before{
+    content:''; position:absolute; top:-7px; left:16px; width:44px; height:16px;
+    background: linear-gradient(rgba(247,237,208,.75), rgba(224,201,148,.62));
+    border: 1px solid rgba(255,255,255,.5);
+    box-shadow: 0 2px 4px rgba(20,11,5,.25);
+    transform: rotate(-4deg);
+    z-index: 3; pointer-events:none;
+  }
+  .frame:nth-child(3n)::before{ left: auto; right: 18px; transform: rotate(5deg); background: linear-gradient(rgba(214,150,110,.55), rgba(173,83,48,.42)); }
+
+  .media-wrap{ position:relative; width:100%; line-height:0; background: rgba(58,42,26,.15); padding: 8px 8px 0; }
+  .media-wrap img, .media-wrap video{ border-radius: 3px; }
+
+  /* ---------- heart / favorite button ---------- */
+  .heart-btn{
+    position:absolute; top: 14px; right: 14px; z-index: 4;
+    width: 30px; height: 30px; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    border-radius: 50%;
+    border: 1.5px solid rgba(247,237,208,.7);
+    background: rgba(45,30,18,.5);
+    -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    color: var(--paper);
+    cursor: pointer;
+    transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .heart-btn svg{ width: 16px; height: 16px; display:block; }
+  .heart-btn:active{ transform: scale(.88); }
+  .heart-btn.active{
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .heart-btn.active svg{ fill: var(--paper); stroke: var(--paper); }
+  .lb-heart-btn{
+    position:absolute; top: calc(14px + var(--safe-t)); left: 14px; z-index:5;
+    width:38px; height:38px; padding:0; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--glass); border:1px solid var(--line); color: var(--ink);
+    cursor:pointer; transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .lb-heart-btn svg{ width:19px; height:19px; }
+  .lb-heart-btn:active{ transform: scale(.9); }
+  .lb-heart-btn.active{ background: var(--accent); border-color: var(--accent); }
+  .lb-heart-btn.active svg{ fill: var(--paper); stroke: var(--paper); }
+  .frame img, .frame video{ width:100%; height:auto; display:block; filter: sepia(.18) saturate(.92) contrast(1.02); }
+  .frame.type-audio .media-wrap img{ aspect-ratio:1/1; object-fit:cover; }
+  .frame audio{ width:100%; display:block; margin: 0 9px 8px; width: calc(100% - 18px); filter: sepia(.4) saturate(1.4) hue-rotate(-10deg) brightness(.95); }
+
+  /* ---------- stickers: small, borderless photos ---------- */
+  .frame.type-sticker{
+    width: var(--sticker-size, 92px);
+    flex: 0 0 var(--sticker-size, 92px);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    align-self: flex-start;
+  }
+  .frame.type-sticker::before{ display:none; }
+  .frame.type-sticker .media-wrap{ background: transparent; padding: 0; }
+  .frame.type-sticker .media-wrap img{ border-radius: 10px; filter: sepia(.1) saturate(1.05) contrast(1.02); box-shadow: 0 4px 10px -4px rgba(20,11,5,.5); }
+  .frame.type-sticker .frame-foot{ display:none; }
+  main.size-4 .frame.type-sticker{ width: calc(var(--sticker-size, 92px) * 0.6); flex: 0 0 calc(var(--sticker-size, 92px) * 0.6); }
+
+  /* ---------- note card: plain editable paper note, double-width ---------- */
+  .frame.type-note{ width: auto; column-span: all; break-inside: avoid; margin-bottom: 14px; }
+  .frame.type-note .note-view{ position:relative; padding: 28px 54px 24px 24px; min-height: 120px; }
+  .frame.type-note .note-title{
+    display:block; font-family:'Caveat', cursive; font-weight:700; font-size: 26px; color: var(--paper-ink); margin-bottom: 8px;
+  }
+  .frame.type-note .note-text{
+    font-family:'Caveat', cursive; font-size: 21px; line-height:1.55; color: var(--paper-ink-dim); white-space: pre-wrap;
+  }
+  .frame.type-note .note-edit-btn{
+    position:absolute; top: 14px; right: 14px; flex-shrink:0; background:none; border:1.5px dashed var(--card-line);
+    color: var(--paper-ink-faint); width: 26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  }
+  /* ---------- timer card: standalone "time since" card with unit picker ---------- */
+  .frame.type-timer{ width: auto; column-span: all; break-inside: avoid; margin-bottom: 14px; }
+  .frame.type-timerpair{
+    width: auto; column-span: all; break-inside: avoid; margin-bottom: 14px;
+    background: transparent; border: none; box-shadow: none; overflow: visible; transform: none !important;
+  }
+  .frame.type-timerpair::before{ display:none; }
+  .frame.type-timer .timer-card{ padding: 26px 24px 22px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .timer-caption{
+    font-family:'Patrick Hand', cursive; font-size: 12.5px; letter-spacing:.06em; text-transform:uppercase; color: var(--paper-ink-faint); margin-bottom: 6px;
+  }
+  .timer-display{ display:flex; align-items:baseline; gap: 10px; margin: 4px 0 16px; }
+  .timer-display .timer-num{
+    font-family:'Caveat', cursive; font-weight:700; font-size: 56px; line-height:1; color: var(--accent);
+  }
+  .timer-display .timer-unit{
+    font-family:'Caveat', cursive; font-weight:600; font-size: 22px; color: var(--paper-ink-dim); text-transform: lowercase;
+  }
+  .timer-picker{ display:flex; gap: 8px; flex-wrap: wrap; justify-content:center; }
+  .timer-pill{
+    font-family:'Patrick Hand', cursive; font-size: 13px; color: var(--paper-ink-dim);
+    background: transparent; border: 1.5px dashed var(--card-line); border-radius: 999px;
+    padding: 6px 14px; cursor:pointer;
+  }
+  .timer-pill.active{
+    background: var(--accent); border-color: var(--accent); color: var(--paper); font-weight:600;
+  }
+
+  /* two half-size timer cards, kept as visibly separate cards with a clear gap */
+  .timer-pair{ display:flex; gap: 10px; align-items: stretch; }
+  .timer-pair .timer-card{
+    flex: 1 1 0; min-width: 0;
+    background: var(--paper); border: 1px solid var(--paper-edge); border-radius: var(--radius);
+    box-shadow: 0 10px 22px -10px rgba(20,11,5,.55), 0 1px 0 rgba(255,255,255,.4) inset;
+  }
+  .timer-card.compact{ padding: 16px 8px 13px; }
+  .timer-card.compact .timer-caption{ font-size: 11px; letter-spacing:.03em; margin-bottom: 5px; }
+  .timer-card.compact .timer-display{ gap: 7px; margin: 4px 0 11px; }
+  .timer-card.compact .timer-display .timer-num{ font-size: 36px; }
+  .timer-card.compact .timer-display .timer-unit{ font-size: 15px; }
+  .timer-card.compact .timer-picker{ gap: 3px; flex-wrap: nowrap; width: 100%; }
+  .timer-card.compact .timer-pill{
+    font-size: 10.5px; padding: 4px 0; flex: 1 1 0; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* ---------- board nav grid: thumbnail links to each other board ---------- */
+  .frame.type-navgrid{
+    width: auto; column-span: all; break-inside: avoid; margin-bottom: 14px;
+    background: transparent; border: none; box-shadow: none; overflow: visible; transform: none !important;
+  }
+  .frame.type-navgrid::before{ display:none; }
+  .nav-grid-card{ display:flex; flex-direction:column; align-items:center; }
+  .nav-grid-card > .timer-caption{ margin-bottom: 10px; color: var(--ink-dim); }
+  .nav-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width:100%; }
+  .nav-item{
+    display:flex; flex-direction:column; background: var(--frame-paper, var(--paper));
+    border: 1px solid var(--paper-edge); border-radius: var(--radius); overflow:hidden;
+    box-shadow: 0 10px 22px -10px rgba(20,11,5,.55), 0 1px 0 rgba(255,255,255,.4) inset;
+    padding:0; cursor:pointer; font: inherit; color: inherit; transition: transform .12s ease;
+  }
+  .nav-item:active{ transform: scale(.97); }
+  .nav-item img{ width:100%; aspect-ratio: 1 / 1; object-fit: cover; display:block; }
+  .nav-item-label{
+    padding: 8px 8px 9px; font-family:'Patrick Hand', cursive; font-size: 13px;
+    color: var(--paper-ink-dim); text-align:center; line-height:1.2;
+  }
+
+  /* ---------- spotify card: embedded playlist/album/track (double-width, spans both columns) ---------- */
+  .frame.type-spotify{ width: auto; column-span: all; break-inside: avoid; margin-bottom: 14px; }
+  .spotify-card{ padding: 0; }
+  .spotify-embed{ width:100%; border:none; display:block; }
+  .frame.type-note .note-edit-btn svg{ width:13px; height:13px; }
+  .frame.type-note .note-edit-btn:active{ background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .frame.type-note .edit-box{ padding: 22px 24px; }
+  .frame.type-note .edit-box input{ font-family:'Caveat', cursive; font-size: 20px; }
+  .frame.type-note .edit-box textarea{ min-height: 110px; }
+
+  .frame-foot{ padding: 9px 10px 10px; }
+  .foot-row{ display:flex; align-items:center; justify-content:space-between; gap:6px; }
+  .foot-row .cap{
+    font-size: 16px; color: var(--paper-ink); font-family:'Caveat', cursive; font-weight:600;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .desc-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:5px; margin-top:3px; }
+  .desc{ font-size: 9.5px; color: var(--paper-ink-dim); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .desc.empty{ font-style: italic; color: var(--paper-ink-faint); }
+  .edit-btn{
+    flex-shrink:0; background:none; border:1.5px dashed var(--card-line); color: var(--paper-ink-faint);
+    width: 24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  }
+  .edit-btn svg{ width:13px; height:13px; }
+  .edit-btn:active{ background: var(--accent); border-color: var(--accent); color: var(--paper); }
+
+  .edit-box{ display:flex; flex-direction:column; gap:6px; }
+  .edit-box input, .edit-box textarea{
+    width:100%; background: rgba(58,42,26,.06); border: 1px solid var(--card-line); color: var(--paper-ink);
+    font-family:'Patrick Hand', cursive; font-size: 12px; padding: 7px 8px; border-radius: 8px; resize: vertical;
+  }
+  .edit-box textarea{ min-height: 54px; }
+  .edit-actions{ display:flex; gap:6px; justify-content:flex-end; }
+  .edit-actions button{
+    font-family:'Patrick Hand', cursive; font-size: 10px; text-transform: uppercase;
+    padding: 6px 12px; border-radius: 20px; border: 1px solid var(--card-line); background: transparent; color: var(--paper-ink-dim);
+  }
+  .edit-actions .save{ background: var(--accent); border-color: var(--accent); color: var(--paper); font-weight:600; }
+
+  /* ---------- hamburger menu overlay ---------- */
+  .menu-backdrop{
+    position: fixed; inset:0; z-index: 90;
+    background: rgba(22,14,8,.6);
+    backdrop-filter: blur(2px);
+    opacity:0; pointer-events:none; transition: opacity .25s ease;
+  }
+  .menu-backdrop.open{ opacity:1; pointer-events:auto; }
+
+  .side-menu{
+    position: fixed; top:0; left:0; bottom:0; z-index: 95;
+    width: 78vw; max-width: 300px;
+    background: rgba(94,64,40,.78);
+    backdrop-filter: blur(16px);
+    border-right: 1px solid var(--line);
+    transform: translateX(-105%);
+    transition: transform .32s cubic-bezier(.4,0,.2,1);
+    padding: calc(20px + var(--safe-t)) 0 calc(20px + var(--safe-b));
+    display:flex; flex-direction:column;
+  }
+  .side-menu.open{ transform: translateX(0); }
+  .side-menu-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 22px 16px; border-bottom: 1px solid var(--line); margin-bottom: 6px;
+  }
+  .side-menu-head span{ font-family:'Caveat', cursive; font-weight:700; font-size: 26px; }
+  .menu-close{
+    width:36px; height:36px; border-radius:50%; border:2px dashed var(--ink-faint); background: transparent;
+    color: var(--ink-dim); display:flex; align-items:center; justify-content:center;
+  }
+  .menu-close svg{ width:16px; height:16px; }
+  .side-menu ul{ list-style:none; margin:0; padding: 6px 0; }
+  .side-menu li{
+    display:flex; align-items:center; gap: 12px; padding: 14px 22px;
+    color: var(--ink-dim); font-family: 'Caveat', cursive; font-weight:600; font-size: 21px;
+    border-left: 3px solid transparent; border-bottom: 1px dashed var(--line);
+    transition: background .15s ease, color .15s ease;
+  }
+  .side-menu li:last-child{ border-bottom: none; }
+  .side-menu li::before{
+    content:'✿'; font-size: 12px; color: var(--ink-faint); flex-shrink:0;
+    transition: color .15s ease;
+    align-self: center;
+  }
+  .side-menu li .menu-text{ flex: 1; display:flex; flex-direction:column; gap: 2px; }
+  .side-menu li .menu-date{
+    font-family: 'Patrick Hand', cursive; font-size: 12px; color: var(--ink-faint);
+  }
+  .side-menu li.active{ color: var(--ink); border-left-color: var(--accent); background: rgba(173,83,48,.16); border-radius: 0 16px 16px 0; }
+  .side-menu li.active::before{ color: var(--accent); }
+  .side-menu li:active{ background: rgba(243,237,224,.06); }
+  .side-menu-more{
+    padding: 10px 22px 4px; color: var(--ink-faint); font-size: 11px; font-family: 'Patrick Hand', cursive;
+    opacity: .7;
+  }
+  .side-menu-foot{
+    margin-top:auto; padding: 16px 22px 0; border-top:1px solid var(--line);
+    color: var(--ink-faint); font-size: 10px; line-height:1.6;
+  }
+
+  /* ---------- lightbox ---------- */
+  .lightbox{
+    position: fixed; inset:0; background: rgba(22,14,8,.94); backdrop-filter: blur(6px); z-index: 200;
+    display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none;
+    transition: opacity .25s ease; padding: 20px;
+  }
+  .lightbox.open{ opacity:1; pointer-events:auto; }
+  .lb-inner{ width:100%; display:flex; flex-direction:column; align-items:center; gap: 14px; }
+  .lb-media-box{
+    position: relative;
+    width:100%; max-height: 60vh; display:flex; align-items:center; justify-content:center;
+    border-radius: var(--radius); overflow:hidden; background: rgba(58,42,26,.35);
+    transition: transform .22s ease, opacity .22s ease; transform: translateX(0); opacity: 1;
+  }
+  .lb-media-box.slide-out-left{ transform: translateX(-38px); opacity: 0; }
+  .lb-media-box.slide-out-right{ transform: translateX(38px); opacity: 0; }
+  .lb-media-box.slide-in-left{ transition: none; transform: translateX(-38px); opacity: 0; }
+  .lb-media-box.slide-in-right{ transition: none; transform: translateX(38px); opacity: 0; }
+  .lb-media-box img, .lb-media-box video{ max-height: 60vh; max-width: 100%; display:block; }
+  .lb-media-box.audio-box{ width: 62vw; max-width:280px; height:62vw; max-height:280px; border-radius: var(--radius); }
+  .lb-media-box.audio-box img{ width:100%; height:100%; object-fit:cover; }
+  .lb-caption{ display:flex; flex-direction:column; align-items:center; gap:6px; color: var(--ink-dim); font-size: 12px; text-align:center; padding: 0 10px; }
+  .lb-caption .title{ font-family:'Caveat', cursive; font-weight:700; color: var(--ink); font-size: 22px; }
+  .lb-caption .desc-full{ font-size:12px; line-height:1.6; color: var(--ink-dim); white-space: pre-line; }
+  .lb-caption .desc-part{ white-space: pre-line; }
+  .lb-caption .desc-lilli{ color: var(--ink); }
+  .lb-caption .desc-divider{ width: 60px; height: 1px; background: var(--line); margin: 10px auto; }
+  .lb-audio{ width: 80vw; max-width:300px; }
+  .lb-close{
+    position: absolute; background: var(--paper); border: 2.5px dashed var(--accent); color: var(--paper-ink);
+    border-radius: 50%; width: 46px; height:46px; display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 14px -4px rgba(20,11,5,.55), 0 1px 0 rgba(255,255,255,.5) inset;
+  }
+  .lb-close svg{ width: 22px; height:22px; }
+  .lb-close{ top: calc(14px + var(--safe-t)); right: 14px; }
+  .lb-close:active{ background: var(--accent); color: var(--paper); border-style: solid; }
+
+  footer{ text-align:center; color: var(--ink-faint); font-size: 9.5px; letter-spacing:.06em; text-transform: uppercase; padding: 4px 20px calc(24px + var(--safe-b)); }
+
+  /* ---------- 4-up screen-size hint ---------- */
+  .hint-backdrop{
+    position: fixed; inset:0; z-index: 210;
+    background: rgba(22,14,8,.6); backdrop-filter: blur(2px);
+    opacity:0; pointer-events:none; transition: opacity .25s ease;
+  }
+  .hint-backdrop.open{ opacity:1; pointer-events:auto; }
+  .hint-card{
+    position: fixed; left:50%; top:50%; z-index: 220;
+    transform: translate(-50%, -50%) scale(.96);
+    width: min(84vw, 320px);
+    background: var(--paper); border: 1px solid var(--paper-edge); border-radius: var(--radius);
+    box-shadow: 0 14px 30px -10px rgba(20,11,5,.6), 0 1px 0 rgba(255,255,255,.4) inset;
+    padding: 22px 20px 18px; text-align:center;
+    opacity:0; pointer-events:none; transition: opacity .22s ease, transform .22s ease;
+  }
+  .hint-card.open{ opacity:1; pointer-events:auto; transform: translate(-50%, -50%) scale(1); }
+  .hint-card p{
+    margin: 0 0 16px; font-family:'Caveat', cursive; font-size: 19px; line-height:1.45; color: var(--paper-ink);
+  }
+  .hint-close{
+    font-family: 'Patrick Hand', cursive; font-size: 12px; letter-spacing:.06em; text-transform: uppercase;
+    padding: 9px 22px; border-radius: 20px; border: 1px solid var(--accent); background: var(--accent); color: var(--paper); font-weight:600;
+  }
+  .hint-close:active{ opacity:.85; }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="bg-tint"></div>
+<div class="grain"></div>
+
+<div class="topbar">
+  <button class="burger" id="burgerBtn" aria-label="Open sections menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <path d="M4 7h16"/>
+      <path d="M4 12h16"/>
+      <path d="M4 17h16"/>
+    </svg>
+  </button>
+  <div class="topbar-titles">
+    <h1 id="boardTitle">Our <em>Memories</em></h1>
+    <div class="sub" id="boardSub">stills, loops &amp; clips</div>
+  </div>
+  <div class="count-pill" id="visibleCount">— frames</div>
+</div>
+
+<div class="filters" id="filtersRow">
+  <button class="chip active" data-filter="all">All</button>
+  <button class="chip" data-filter="image">Photos</button>
+  <button class="chip" data-filter="video">Videos</button>
+  <button class="chip" data-filter="audio">Music</button>
+</div>
+
+<div class="size-row" id="sizeRow">
+  <button class="size-chip active" data-size="2">2‑Up</button>
+  <button class="size-chip" data-size="4">4‑Up</button>
+</div>
+
+<main id="grid"></main>
+
+<footer>tap ☰ to switch boards</footer>
+
+<div class="menu-backdrop" id="menuBackdrop"></div>
+<nav class="side-menu" id="sideMenu">
+  <div class="side-menu-head">
+    <span>Boards</span>
+    <button class="menu-close" id="menuClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+        <path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>
+        <circle cx="6.5" cy="6.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="17.5" cy="6.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="6.5" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="17.5" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+  </div>
+  <ul id="menuList"></ul>
+  <div class="side-menu-more">More memories coming soon</div>
+  <div class="side-menu-foot">tap outside the panel<br>to close this menu</div>
+</nav>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose" aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+      <path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>
+      <circle cx="6.5" cy="6.5" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="17.5" cy="6.5" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="6.5" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="17.5" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
+  <div class="lb-inner">
+    <div class="lb-media-box" id="lbMediaBox"></div>
+    <div class="lb-caption">
+      <span class="title" id="lbTitle"></span>
+      <div class="desc-full" id="lbDesc"></div>
+    </div>
+  </div>
+</div>
+
+<div class="hint-backdrop" id="hintBackdrop"></div>
+<div class="hint-card" id="hintCard">
+  <p>I made the 4-up view for opening the website on laptop or ipad maybe, on the phone I think it looks the best on 2 up one, but you can use whichever you like the most!</p>
+  <button class="hint-close" id="hintClose">Got it</button>
+</div>
+
+<script>
+  const ICONS = {
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+    gif: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8v8M11 8v8M17 8h-4v3h3.5"/></svg>',
+    video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="M17 10l5-3v10l-5-3"/></svg>',
+    audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'
+  };
+
+  const HEART_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-10-9.3C.4 7.9 2 4.5 5.4 3.7c2-.5 4 .3 5.2 2.1l1.4 2 1.4-2c1.2-1.8 3.2-2.6 5.2-2.1 3.4.8 5 4.2 3.4 7.5-2.5 4.7-10 9.3-10 9.3z"/></svg>';
+
+  // ---------- DATA: swap these for your own boards & media ----------
+  const BOARDS = {
+    'introduction': {
+      title: 'Our <em>Memories</em>', sub: 'For my anjelik',
+      items: [
+        { type:'note', title:'Hello my dearest Lilli', desc:'The day you are first time reading this is the day of our 6 month anniversary. At first it might not seem like much but its literal half a year spent together with you, and I can say for sure this whole year is the best year in my life thanks to you. I made this website for you and for us to keep all of our memories in one place, and whenever you will feel down, miss me, or anything you can come here to remember the memories we made together. I look forward to making more great memories with you in the future and I hope there will be so many of them this website wont even have enough capacity to store it all. So happy anniversary again baby and I hope you will like it:) Sincerely, your Simon', no:'i01' },
+        { type:'timerpair', no:'i02', timers:[
+          { sinceDate: new Date(2026, 1, 22, 22, 0, 0), caption: 'We are together for' },
+          { sinceDate: new Date(2026, 0, 3, 17, 0, 0), caption: 'We know each other for' }
+        ] },
+        { type:'navgrid', no:'i03' },
+      ]
+    },
+    'working': {
+      title: 'Our <em>Memories</em>', sub: '',
+      cover: 'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/1786534632696.jpg', // <- change this URL to pick this board's cover photo on the Introduction page
+      items: [
+        { type:'note', title:'Slovakia', desc:'I was so, so, so excited about you finally coming here. Unfortunately, I got sick a few days before, and that lowkey ruined the experience for both of us since you caught it too :( Nevertheless, I still really enjoyed every second of you being here, made great memories with you, and I hope you did too. I’m also glad you could finally meet my parents (and basically my entire family XD). Everyone really adored you and you left a great impression. I can’t wait for you to visit again! <3', no:'n-working' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/768083431_2460183867798824_155287951899733694_n.jpg', title:'Emanuel ❤️', desc:'Lilli: ', no:'001' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/1786534633813.jpg', title:'Watching Creep 2', desc:'Lilli: ', no:'002' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/354feb14-2638-4ed1-a425-96c5ad8453a8.jpg', title:'This pic lowk awkward 😭 but still cute', desc:'Lilli: ', no:'003' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/767597128_1965511284068519_8140292260371907878_n.jpg', title:'My home', desc:'Lilli: ', no:'004' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/1786534632616.jpg', title:'Im so fucking scared', desc:'Lilli: ', no:'005' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/Gauguin.mp3', poster:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/ab67616d0000b273a0a49dbf8259fe4a567427b6.jpg', title:'Colorfactory - Gauiguin', desc:'', no:'M01' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/768545877_27542402395458743_1319228929624757058_n.jpg', title:'Feet👅👅👅', desc:'Lilli: ', no:'006' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/768545860_1604218134409906_1724750377697865146_n.jpg', title:'Buny want huggies🥺', desc:'Lilli: ', no:'007' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/766861379_1584314476476366_6945261392447207281_n.jpg', title:'Tuff.', desc:'Lilli: ', no:'008' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/1786534632395.jpg', title:'tongue emoji', desc:'Lilli: ', no:'009' },
+        { type:'sticker', src:'https://i.postimg.cc/jj3x64bM/da22bd0323fef2a6c9d6270ae1bda9f9.jpg', title:'', desc:'', no:'S01', size: 170 },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/769403177_1032636189395214_990361565130838209_n.jpg', title:'#sugoi', desc:'Lilli: ', no:'010' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/774280919_4010218999280905_7572604119923430369_n.jpg', title:'Me ready to fight for them cheeks', desc:'Lilli: ', no:'011' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/771755874_1592295462565048_3743291311384205213_n.jpg', title:':o', desc:'Lilli: ', no:'012' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/67ca26fe-070e-4952-84f6-f253012b3dcb.jpg', title:'This photo haunts me in my dreams.', desc:'Lilli: ', no:'013' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/1786534632545.jpg', title:'Cute 🥹🥹', desc:'Lilli: ', no:'014' },
+        { type:'video', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-1/3e630ec1-5c8f-4d69-bb5d-30513902820e.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Part 2 coming soon', desc:'Lilli: ', no:'015' },
+        { type:'sticker', src:'https://i.postimg.cc/TwdrMpXH/9af3e00f118ce39285dbd536652465cb.jpg', title:'', desc:'', no:'S01', size: 170 },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/769412086_1614871853531232_8853751559370101428_n.jpg', title:'me and the gurls sipping on the ✨le matcha✨', desc:'Lilli: ', no:'016' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/773098642_2973891072948674_5431067089210901389_n.jpg', title:'"You got games on your phone?"', desc:'Lilli: ', no:'017' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/770830759_2484467812048474_5595098186155296146_n.jpg', title:'Me giving you head', desc:'Lilli: ', no:'018' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/Dreams%20From%20Bunker%20Hill%20-%20Cigarettes%20After%20Sex.mp3', poster:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/artworks-aDUojx5G7jPH-0-t500x500.jpg', title:'Dreams From Bunker Hill', desc:'', no:'M02' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/772888817_3086920041514936_3882873666508714849_n.jpg', title:'Little alcoholics 🥹', desc:'Lilli: ', no:'019' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/763617617_1078928341156752_5971555999638691941_n.jpg', title:'Wine critics in action', desc:'Lilli: ', no:'020' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/1786534632696.jpg', title:'🥹🥹', desc:'Lilli: ', no:'021' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/761584319_1373470074900077_1753038291898862254_n.jpg', title:'Now I know who up eating butt.', desc:'Lilli: ', no:'022' },
+        { type:'sticker', src:'https://i.postimg.cc/0yZSG9SV/775a0bdea633ea9c513ef46d0f46827a.jpg', title:'', desc:'', no:'S01', size: 170 },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/770426898_1365266588522438_571755169104859490_n.jpg', title:'Yum', desc:'Lilli: ', no:'023' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/767242790_1401058881987865_794529596976470958_n.jpg', title:'In our furry era', desc:'Lilli: ', no:'024' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/755864396_1034798679474031_1857557829452940663_n.jpg', title:'They say this is the hardest pic oat', desc:'Lilli: ', no:'025' },
+        { type:'gif', src:'https://media1.tenor.com/m/7DRvhrcdK1UAAAAC/lock-in.gif', title:'You when we came home drunk', desc:'', no:'026' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/770700523_3375272372860643_6404904957671967016_n.jpg', title:'Gallons were lost to this.', desc:'Lilli: ', no:'028' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/768307832_2074773479805268_94649204845777548_n.jpg', title:'I miss this room already :(', desc:'Lilli: ', no:'029' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/771023324_2129077088005550_3861268053490956448_n.jpg', title:'📍Folk valley', desc:'Lilli: ', no:'030' },
+        { type:'image', src:'https://i.postimg.cc/G2Ym23ck/33d76a21-7431-4419-9493-678f38922794.jpg', title:'Oh my gyat', desc:'Lilli: ', no:'038' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/773695960_1771241297209689_1383727427654848872_n.jpg', title:'Emanuel ❤️ part 2', desc:'Lilli: ', no:'031' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/Amfetaminowa%20Siostra.mp3', poster:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/7cc5004060d48dd3c27c70ac856e3991.1000x1000x1.jpg', title:'Amfetaminowa Siostra', desc:'', no:'M03' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/772203019_4227737624036478_2536669365570702857_n.jpg', title:'That damn smirk', desc:'Lilli: ', no:'032' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/762565818_2371229673402654_683613468464145981_n.jpg', title:'I dont even know what to say to this one', desc:'Lilli: ', no:'033' },
+        { type:'gif', src:'https://media1.tenor.com/m/lgjnVcfWdpEAAAAC/love-snuggle.gif', title:'Us sleeping tg', desc:'', no:'027' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/760554581_2135051204088705_4014268900181068444_n.jpg', title:'What a night...', desc:'Lilli: ', no:'034' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/770917996_1039029929028520_4231209222658633725_n.jpg', title:'Me and my beautiful wife hi', desc:'Lilli: ', no:'035' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/769385133_930735090059429_5809406345261916870_n.jpg', title:'Its a shame we werent more in the jacuzzi', desc:'Lilli: ', no:'036' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/8ae089a5-6c7b-45c0-aefd-e5c5aceda593.jpg', title:'Geeked vs locked in', desc:'Lilli: ', no:'037' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/765297300_1114140900943363_3876479105965695466_n.jpg', title:'Would love to eat that again...the pizza too ig', desc:'Lilli: ', no:'038' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/045712e9-2411-4fc2-9514-7f679dd38621.jpg', title:'Not a fan of this pic but we are still cute', desc:'Lilli: ', no:'039' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/771939174_1423239949858672_8345613769212479289_n.jpg', title:'Me and my beautiful wife again hi', desc:'Lilli: ', no:'040' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/762937270_1087505567045278_6671168610148321348_n.jpg', title:'jaszczurka', desc:'Lilli: ', no:'041' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/763654135_1761045981684589_3427106525689898520_n.jpg', title:'Grilling👍', desc:'Lilli: ', no:'042' },
+      
+      ]
+    },
+    'torun-natalia-poznan': {
+      title: 'Our <em>Memories</em>', sub: 'A lot has happened then.',
+      cover: 'https://i.postimg.cc/L4Y0wyBH/e9127d48-8b77-4b51-82a3-6773300d0ee3.jpg', // <- change this URL to pick this board's cover photo on the Introduction page
+      items: [
+        { type:'note', title:'Toruń, Natalia, Poznań', desc:'I was so excited for this trip, because after Krakow we both realized, that just barely 2 days is absolutely not enough for us and now I can spend with you whole 5 days!! But also at the same time I was so fucking scared to meet your family and had no idea what to expect. Luckily it all turned out great (if we dont count the fight w your mom, me being sick, the car crash and our first pregnancy scare) and they were some of the best days of my life:)', no:'n-tnp' },
+        { type:'spotify', url:'https://open.spotify.com/playlist/0lWnYa8Bt2p4q4jVDEBo9w?si=6757ba726dea4af9', height:352, no:'sp01' },
+        { type:'image', src:'https://i.postimg.cc/PfgFjm20/02f463ad-88a4-4c77-bd54-a871db185914.jpg', title:'I like this picture.', desc:'Lilli: ', no:'001' },
+        { type:'image', src:'https://i.postimg.cc/ncqScCWp/0ccb7b71-a50e-48e8-9edb-cf78c16b11cd.jpg', title:'Holy jawline wtf 😭', desc:'Lilli: ', no:'002' },
+        { type:'image', src:'https://i.postimg.cc/15D75fdN/0e4ec127-0c3d-4fff-9e70-f9d7472ad005.jpg', title:'Train :O', desc:'Lilli: ', no:'003' },
+        { type:'image', src:'https://i.postimg.cc/wjHft9Kv/1146ac5c-2496-4fb1-b90d-347d9870e65d.jpg', title:'🧍‍♂️', desc:'Lilli: ', no:'004' },
+        { type:'image', src:'https://i.postimg.cc/c1g52DM1/120e104a-e970-4b02-a960-15f0867fe353.jpg', title:'Geeked vs locked in', desc:'Lilli: ', no:'005' },
+        { type:'image', src:'https://i.postimg.cc/VvCGt6L7/1932d0d5-438f-44c2-b636-f0bb6e6c9c06.jpg', title:'Holy hair holy hair holy hair', desc:'Lilli: ', no:'006' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/Chcia%C5%82bym%20umrze%C4%87%20z%20mi%C5%82o%C5%9Bci%20(Live).mp3', poster:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/artworks-Hp1ipbxBv5Pq-0-t500x500.jpg', title:'Chciałbym umrzeć z miłości', desc:'', no:'M01' },
+        { type:'image', src:'https://i.postimg.cc/8kJn9yBd/264ff884-738a-4b81-b8ee-ef5137cf3274.jpg', title:'This was so fun to make', desc:'Lilli: ', no:'007' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/12d1aa2c-16ff-4271-8a35-c98677ac5813.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Me want milk googoo gaga', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/C1Dx1MFH/9ef75600-25f0-4047-b032-b39081c5c98c.jpg', title:'Beautiful.', desc:'', no:'001' },
+        { type:'image', src:'https://i.postimg.cc/B6Dn6ZqT/bae1868b-a378-4495-876f-06c6f58d11c9.jpg', title:'Another holy hair', desc:'', no:'002' },
+        { type:'sticker', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/343d750d82cba1a9d02fda8d09a18d55.jpg', title:'', desc:'', no:'S01', size: 170 },
+        { type:'image', src:'https://i.postimg.cc/qM2DMzFB/2c2eb858-2008-431b-a7da-a72590785cf2.jpg', title:'Interesting angle xd', desc:'Lilli: ', no:'008' },
+        { type:'image', src:'https://github.com/Koku204/Library/blob/Koku204-patch-2/21f5c639-f0ae-4eec-85db-f65fb79fd9ee.jpg?raw=true', title:'Interlocked forever ❤️', desc:'Lilli: ', no:'008' },
+        { type:'image', src:'https://i.postimg.cc/Kcksw9r4/35607d06-078a-4349-bf32-60ca74ec432c.jpg', title:'Dont eat no', desc:'Lilli: ', no:'009' },
+        { type:'image', src:'https://i.postimg.cc/bY7FhQmX/3f9e9295-9db8-4e8c-ad39-ea86426c7862.jpg', title:'Who is this cutie next to me', desc:'Lilli: ', no:'010' },
+        { type:'image', src:'https://i.postimg.cc/Y2GyZXf1/4ddf0504-7827-460e-a1c4-bae169f6fda3.jpg', title:'This is better', desc:'Lilli: ', no:'011' },
+        { type:'image', src:'https://i.postimg.cc/CLbrLz2n/51fc42a4-dd83-4fd9-8169-aad99660fcd1.jpg', title:'First time sitting on a floor kinda nervous', desc:'Lilli: ', no:'012' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/feb80ca8-dcfb-4134-a5fb-b5b2102d2cc6.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Enter', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/59YkTPqX/52e1be3d-f5e2-405e-8dfe-14d111a3ab75.jpg', title:'What dat tongue do 😳', desc:'Lilli: ', no:'013' },
+        { type:'image', src:'https://i.postimg.cc/1RnY2Wcz/56857805-3422-4e81-b72f-5724da97986d.jpg', title:'Kiss', desc:'Lilli: ', no:'014' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/08ef91ce-36ec-4408-ba9e-61161c5f20e4.jpg', title:'I love this pic', desc:'Lilli: ', no:'014' },
+        { type:'image', src:'https://i.postimg.cc/Vk1GSzyM/62bde51a-8478-448d-81e3-11518c90c176.jpg', title:'<33', desc:'Lilli: ', no:'015' },
+        { type:'image', src:'https://i.postimg.cc/9FygFrkf/68f2f1d9-bbe8-477a-a829-8e790d31a929.jpg', title:'When I say on gang this is the gang in question', desc:'Lilli: ', no:'016' },
+        { type:'gif', src:'https://media1.tenor.com/m/1XCjCIC-VUQAAAAC/gif.gif', title:'Your mom every time we were alone for a second', desc:'', no:'026' },
+        { type:'image', src:'https://i.postimg.cc/kGb1S4Xp/898ba2f4-c1f1-47fa-b3da-30594116153b.jpg', title:'Dont hide your prety face😹', desc:'Lilli: ', no:'019' },
+        { type:'image', src:'https://i.postimg.cc/nhZRsn8Q/7b2f1d4d-3096-40f3-a2fd-c0458d7ffd0a.jpg', title:'So cute', desc:'Lilli: ', no:'017' },
+        { type:'image', src:'https://i.postimg.cc/15D75fdZ/7ef9a7d4-247f-4fc6-a9e5-30b17b70dc2d.jpg', title:'True sigmas', desc:'Lilli: ', no:'018' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/61d00820-09eb-49b7-ac31-2358edd2e82c.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'I didnt want to leave :(', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/FFdn8PgN/8b72872c-7a3c-43df-b6fb-8acbf97c0153.jpg', title:'It was an honour to wield the Perfotmative males slayer', desc:'Lilli: ', no:'020' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/Green%20Day%20-%20Last%20Night%20On%20Earth.mp3', poster:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/439115.webp', title:'Last Day On Earth', desc:'', no:'M01' },
+        { type:'image', src:'https://i.postimg.cc/rsrn4mFY/9082c660-0297-41f6-b9c3-838c88239a64.jpg', title:'Im dating a vampire bruh', desc:'Lilli: ', no:'021' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/40dc0a1139dbe0174c16b37e8d9a0253.jpg', title:'10/10 movie would rewatch', desc:'Lilli: ', no:'023' },
+        { type:'image', src:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/0ed46a4b-a5d7-46af-8d06-2d50d189dcca.jpg', title:'Ew.', desc:'Lilli: ', no:'021' },
+        { type:'image', src:'https://i.postimg.cc/ncqScCPW/938c5e64-5878-4be7-bbd6-9823e74f0dcb.jpg', title:'Kiss kiss kiss', desc:'Lilli: ', no:'022' },
+        { type:'image', src:'https://i.postimg.cc/NG3Pc1pN/972447ff-77a1-4e7a-a886-94d9f4c46c9d.jpg', title:'Me, slowly fading away...', desc:'Lilli: ', no:'023' },
+        { type:'image', src:'https://i.postimg.cc/gcXBQMqR/9e01ec17-3c02-4fbf-a233-c22b81a2042a.jpg', title:'What the fuck is this', desc:'Lilli: ', no:'025' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/964d8261-4c3b-4632-8bd0-725dd876216c.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'This..is something for sure...', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/tRZmwrt4/b36752b2-d31a-4362-8970-6c9c0a32fb19.jpg', title:'Why you look so uncomfortable here 😭', desc:'Lilli: ', no:'027' },
+        { type:'gif', src:'https://media1.tenor.com/m/xwpnmanobsMAAAAd/princess-mononoke-ashitaka.gif', title:'', desc:'', no:'026' },
+        { type:'image', src:'https://i.postimg.cc/x8zxmCTh/b8ebe518-2e2e-4916-9497-7695d8e3701b.jpg', title:'Tung is always watching.', desc:'Lilli: ', no:'028' },
+        { type:'image', src:'https://i.postimg.cc/v8JSsW0d/d397bb02-8d31-400e-bc44-18b09da3f23b.jpg', title:'Why the long face', desc:'Lilli: ', no:'029' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/Heart%20To%20Heart.mp3', poster:'https://raw.githubusercontent.com/Koku204/Library/refs/heads/Koku204-patch-2/artworks-igM1jF1WSwyq-0-t500x500.jpg', title:'Heart to Heart', desc:'', no:'M01' },
+        { type:'image', src:'https://i.postimg.cc/G38SVMJs/d7e1f63f-f571-45d6-92e5-4a8c4da42aae.jpg', title:'So friggin tuff!!', desc:'Lilli: ', no:'030' },
+        { type:'sticker', src:'https://github.com/Koku204/Library/blob/Koku204-patch-2/883b57ee8e97658b95cad316978b1c1e.jpg?raw=true', title:'', desc:'', no:'S01', size: 170 },
+        { type:'image', src:'https://i.postimg.cc/HkHZJTGb/e1fb7ff8-c51c-4f45-ae7b-4a977d61e2f1.jpg', title:'Cute', desc:'Lilli: ', no:'031' },
+        { type:'image', src:'https://i.postimg.cc/zvgthBXx/e2825bd2-7416-46a6-a84d-450217e25465.jpg', title:'👅👅', desc:'Lilli: ', no:'032' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/96774182-c2e2-478f-9871-be0f01aba1c4.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'No comment', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/2jbXMHFy/e3f8d173-6a47-4914-a6b9-2fd6fdfaacdc.jpg', title:'My shy baka 🥺', desc:'Lilli: ', no:'033' },
+        { type:'image', src:'https://i.postimg.cc/L4Y0wyBH/e9127d48-8b77-4b51-82a3-6773300d0ee3.jpg', title:'Cutie', desc:'Lilli: ', no:'034' },
+        { type:'image', src:'https://i.postimg.cc/15D75fjb/eef610b2-a8c0-4735-9a0c-950ec3fb710a.jpg', title:'Hes right behind me isnt he..', desc:'Lilli: ', no:'035' },
+        { type:'image', src:'https://i.postimg.cc/pVh140YJ/f7658428-775d-4da4-808d-a566ecb411c9.jpg', title:'Me like this', desc:'Lilli: ', no:'036' },
+        { type:'image', src:'https://i.postimg.cc/6qvjZ35k/a583129b-5498-4bf8-a5fd-c406c2a6dbcd.jpg', title:'You da real vinyl', desc:'Lilli: ', no:'026' },
+        { type:'image', src:'https://i.postimg.cc/BnD1VhCB/771967992-1739135623955376-614984097999143222-n.jpg', title:'macicky', desc:'Lilli: ', no:'026' },
+      ]
+    },
+    'krakow': {
+      title: 'Our <em>Memories</em>', sub: '',
+      cover: 'https://i.postimg.cc/BbR1Yc5p/8377c941-da39-44b1-a4d9-86a7d0718ea0.jpg', // <- change this URL to pick this board's cover photo on the Introduction page
+      items: [
+        { type:'note', title:'Krakow', desc:'The day we have both been looking forward to ever since we started dating, or even before now that I think about it. The day of us finally meeting irl. I was looking forward to this moment months ahead, and every day closer I could feel the excitement more and more. Tbh I wasnt even that nervous until I was actually sitting in th bus realizing that I am bout to meet the person that I never met before, but love the most in my life. All that worrying was luckily for nothing because I am confident to say those 2 days were the best days of my life. It all felt so magical and surreal to me, like it was just too good to be true. Ever since then I was counting down days till when I can see you again.', no:'n-tnp' },
+        { type:'spotify', url:'https://open.spotify.com/playlist/0cO725IvL8FjkqtdOnsyjJ?si=1b264a1b2d0245a3', height:352, no:'sp01' },
+        { type:'image', src:'https://i.postimg.cc/cCP89M7k/61e1bf8e-81b0-43dc-8ecc-d6b738fec8f0.jpg', title:'One of my favorite pics from Krakow', desc:'', no:'007' },
+        { type:'image', src:'https://i.postimg.cc/6pYdrR2Z/146a517a-5925-4870-9c82-53ed2d9b52e4.jpg', title:'Beautiful tree', desc:'', no:'002' },
+        { type:'image', src:'https://i.postimg.cc/QNz5dhL3/e9564d37-0a86-409f-9708-65b5f32db84c.jpg', title:'I miss this room', desc:'', no:'003' },
+        { type:'image', src:'https://i.postimg.cc/0Nj7cQDf/1a737bb0-c55b-44bb-87be-31de0eb8066c.jpg', title:'Shame we couldnt makeout under that willow would be so peak :(', desc:'', no:'004' },
+        { type:'image', src:'https://i.postimg.cc/9XkTQC3j/1f50ae8d-67b0-4ab8-8b4d-cf473d4e1830.jpg', title:'Cutie', desc:'', no:'005' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/035f1357-0de3-44b3-9fa0-d8e5f03749ba.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'It was so good I been craving another one since', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/6pYdrR2p/337f94ec-3794-4cf8-959c-196641bbee47.jpg', title:'', desc:'', no:'006' },
+        { type:'image', src:'https://i.postimg.cc/D0RbjdQq/153779da-30bf-4262-9b20-0124a4baf27d.jpg', title:'Miss having them too lowk 👀', desc:'', no:'001' },
+        { type:'image', src:'https://i.postimg.cc/d03G41r5/274d191a-3b1f-4201-bace-206a26ff7e64.jpg', title:'', desc:'', no:'008' },
+        { type:'gif', src:'https://media1.tenor.com/m/ZUJ9UzZOrC8AAAAC/excited-happy.gif', title:'Me when I first seen you', desc:'', no:'026' },
+        { type:'image', src:'https://i.postimg.cc/G3fYmd0c/5b033a62-50ba-427d-81d6-b99bdcf37d55.jpg', title:'Yum yum yum', desc:'', no:'009' },
+        { type:'image', src:'https://i.postimg.cc/1zXDJtwJ/59dafda0-2108-4b8e-be79-35a1e6acc68e.jpg', title:'Window :O', desc:'', no:'010' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/5418503d5fbbe9cd1cbbecd5055eb25a67880a94/Big%20Thief%20-%20How%20Could%20I%20Have%20Known%20(Official%20Lyric%20Video).mp3', poster:'https://i.postimg.cc/DfLMK2YJ/a0135149855-16.jpg', title:'How Could I Have Known', desc:'', no:'M01' },
+        { type:'image', src:'https://i.postimg.cc/bJbwJYzm/41c3f6eb-a02d-4c82-80a3-144bafc773c4.jpg', title:'ZAMN', desc:'', no:'012' },
+        { type:'image', src:'https://i.postimg.cc/x8BbxyGR/7822875c-35b2-44d1-9161-37565c468400.jpg', title:'Yum yum', desc:'', no:'011' },
+        { type:'image', src:'https://i.postimg.cc/tgJF2TWS/426f6f87-ce63-415d-a7ee-9754449c6cb1.jpg', title:'Kinda regret we didnt buy it after all', desc:'', no:'012' },
+        { type:'sticker', src:'https://i.postimg.cc/ht5BQyrf/5c8d0fc8cdd4fe64e7fab5b8ace69c33.jpg', title:'', desc:'Life is roblox', no:'S01', size: 170 },
+        { type:'image', src:'https://i.postimg.cc/tRcP4p09/ebb5f604-6541-46be-a820-311f23d1bc8a.jpg', title:'Pigon', desc:'', no:'013' },
+        { type:'image', src:'https://i.postimg.cc/CK5bm1k5/c66d7767-fe3b-4a61-ae65-7f3153314ca3.jpg', title:'Kocur', desc:'', no:'014' },
+        { type:'image', src:'https://i.postimg.cc/nh0v47jj/7318ffc1-ce78-4245-a4ea-9e1853fbd786.jpg', title:'', desc:'', no:'016' },
+        { type:'image', src:'https://i.postimg.cc/zDQWG8m5/5642b45d-1383-46e7-85df-c29b67a8b7dc.jpg', title:'What kind of tuff is this', desc:'', no:'017' },
+        { type:'image', src:'https://i.postimg.cc/9QJGdTRF/18c7d46f-7eac-49cd-9327-7c2dd7967bf8.jpg', title:'', desc:'', no:'018' },
+        { type:'image', src:'https://i.postimg.cc/G3fYmd0w/a2e9491b-93ec-4d81-87e8-50b37f8dab5c.jpg', title:'', desc:'', no:'019' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/5418503d5fbbe9cd1cbbecd5055eb25a67880a94/Lord%20Huron%20-%20The%20Night%20We%20Met%20(Official%20Audio).mp3', poster:'https://i.postimg.cc/bYkBjzFd/The-Night-We-Met.jpg', title:'The Night We Met', desc:'', no:'M01' },
+        { type:'image', src:'https://i.postimg.cc/PqJ12xYM/974a5f27-515b-4d47-9d11-7c120f3aef4a.jpg', title:'', desc:'', no:'020' },
+        { type:'image', src:'https://i.postimg.cc/hvN7yb80/29552bfd-7c1f-4e74-8257-c0a2c4d5b8ba.jpg', title:'Ur so cute here omg', desc:'', no:'021' },
+        { type:'image', src:'https://i.postimg.cc/BbR1Yc5p/8377c941-da39-44b1-a4d9-86a7d0718ea0.jpg', title:'', desc:'', no:'023' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/9c63fbc5-bfb6-40a5-a934-c913193035c1.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Love this transition', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/9f0yJMZD/384d9336-ee61-48e2-9d6f-9b6e599827e2.jpg', title:'This speaks to me', desc:'', no:'024' },
+        { type:'image', src:'https://i.postimg.cc/QNz5dhLL/acb7b239-5b6a-411c-8b28-d7d48f93fc09.jpg', title:'My current lockscreen wallpaper', desc:'', no:'025' },
+        { type:'image', src:'https://i.postimg.cc/s2x5wX7v/2d0e3325-7334-4987-81b6-41249929d045.jpg', title:'Thought it says jews in the back', desc:'', no:'026' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/5418503d5fbbe9cd1cbbecd5055eb25a67880a94/Matt%20Maltese%20-%20Buses%20Replace%20Trains%20%5BOfficial%20Audio%5D.mp3', poster:'https://i.postimg.cc/66nmN914/ab67616d0000b273854b96c852437f2fd3b8888d.jpg', title:'Buses Replace Trains', desc:'', no:'M01' },
+        { type:'image', src:'https://i.postimg.cc/KcWL8xXb/f57b5dd0-65bc-47ae-91bd-366304b3fa52.jpg', title:'Poopy door', desc:'', no:'027' },
+        { type:'image', src:'https://i.postimg.cc/Xvq9QJdY/78a303bb-9e74-4122-8833-0035f29fc2da.jpg', title:'', desc:'', no:'028' },
+        { type:'image', src:'https://i.postimg.cc/jq1NSKpp/70c484ec-3b34-4e3b-a71d-c3b0e781db47.jpg', title:'You always gotta mog me', desc:'', no:'029' },
+        { type:'sticker', src:'https://i.postimg.cc/kXgBPHY1/7595c9eca267729c63791287aaec483c.jpg', title:'', desc:'', no:'S01', size: 170 },
+        { type:'image', src:'https://i.postimg.cc/k48g4Mnv/cd760702-5ec5-4ab4-b022-fec7864c5a71.jpg', title:'I need my Juddy Hopps', desc:'', no:'013' },
+        { type:'image', src:'https://i.postimg.cc/8zthRWJF/7a74a7b8-1cc9-4735-9bc0-d3d4c99b7879.jpg', title:'', desc:'', no:'030' },
+        { type:'image', src:'https://i.postimg.cc/nLrq0zBw/9f0c3325-fcc3-464f-a87b-edf6e93f9723.jpg', title:'Would love to see the mon you', desc:'', no:'031' },
+        { type:'image', src:'https://i.postimg.cc/KjCgqr7D/efcbf5fa-08c1-4405-893a-9ecd52a5acb6.jpg', title:'Chud and Foid ❤️', desc:'', no:'032' },
+        { type:'gif', src:'https://media1.tenor.com/m/nsWp3stUtTQAAAAC/bucktooth-bucktooth-emoji.gif', title:'Us when we realized the bus is in 10 minutes', desc:'', no:'026' },
+        { type:'image', src:'https://i.postimg.cc/dV482dk1/c284b9b0-d330-4d90-94db-e203f8ea2dae.jpg', title:'Love this pic too', desc:'', no:'033' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/5418503d5fbbe9cd1cbbecd5055eb25a67880a94/Weyes%20Blood%20-%20Andromeda.mp3', poster:'https://i.postimg.cc/66nmN917/ab67616d0000b2730c64e752dec4c08362cc4a88.jpg', title:'', desc:'', no:'M01' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-2/c5bd3028-577b-4bdf-b598-b960eda970d4.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/P52mWZpN/f3fcb3de-0afd-4924-b6be-5dd55ffe102e.jpg', title:'Bring me there again', desc:'', no:'034' },
+      ]
+    },
+    'random': {
+      title: 'Our <em>Memories</em>', sub: '',
+      cover: 'https://i.postimg.cc/N06HDc3n/772655606-1414368327257256-7097632574449432205-n.jpg', // <- paste an image URL here to pick this board's cover photo on the Introduction page (leave empty for auto)
+      items: [
+        { type:'note', title:'Random pics', desc:'Here are some random pictures dating from the time we first met each other till now (excluding ones of us being together). Some of these really bring back great memories and I feel a bit nostalgic to those times. I also didnt find that many good ones so if you have any that you would like here please send them to me and I will add them. Som', no:'r01' },
+        { type:'image', src:'https://i.postimg.cc/76Pc1YFB/10cb7f40-bb59-4c0c-aef2-950c74ba9a6f.jpg', title:'😈😈😈', desc:'Lilli: ', no:'030' },
+        { type:'image', src:'https://i.postimg.cc/76Pc1YFt/0be495d6-baa6-4a42-b30b-7f0132cdc13c.jpg', title:'Who is this diva??', desc:'Lilli: ', no:'029' },
+        { type:'image', src:'https://i.postimg.cc/SsZPgbqk/1c0fb5c4-5558-4734-8c12-31ddb00711b3.jpg', title:'Nightmare fuel', desc:'Lilli: ', no:'031' },
+        { type:'image', src:'https://i.postimg.cc/FRFqbsMn/365c2f3b-b8ef-423f-8080-b42fc02bb571.jpg', title:'I had that shit on lowk', desc:'Lilli: ', no:'032' },
+        { type:'image', src:'https://i.postimg.cc/3RLqtQ78/4c3c82cc-d456-4a33-83f9-f5adda146b7f.jpg', title:'My dream come true🥹', desc:'Lilli: ', no:'033' },
+        { type:'image', src:'https://i.postimg.cc/W3pKmbB8/672201553-1974625580596039-935894705897719199-n.jpg', title:'Plakal', desc:'Lilli: ', no:'034' },
+        { type:'image', src:'https://i.postimg.cc/tTRfdCKD/675272723-2259123738182193-5570687863592133896-n.jpg', title:'#real', desc:'Lilli: ', no:'035' },
+        { type:'image', src:'https://i.postimg.cc/pT0SsMxv/710f8154-f910-47e2-8192-bcb514cd8f2e.jpg', title:'hi', desc:'Lilli: ', no:'036' },
+        { type:'image', src:'https://i.postimg.cc/j581MYKb/8072fbf1-f7da-4a85-9224-3e76ab3e139c.jpg', title:'Can I see', desc:'Lilli: ', no:'037' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/main/60777592-a8e1-4b94-80eb-b79adbb79d07.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Freak demon', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/bJYM0wXY/ca42cb0e-fde3-4b23-8054-3b214899fb6f.jpg', title:'Had to sniff my screen and I accidentally made a giant hole in the monitor', desc:'Lilli: ', no:'043' },
+        { type:'image', src:'https://i.postimg.cc/sXf8PDkk/8709e09d-17f6-4420-b30a-37d18f7289f0.jpg', title:'Eye of rah', desc:'Lilli: ', no:'039' },
+        { type:'image', src:'https://i.postimg.cc/MTZ40pkG/8e1be1ba-4abe-41eb-8ee2-625a0d1307aa.jpg', title:'Now I see after who you got allat from', desc:'Lilli: ', no:'040' },
+        { type:'spotify', url:'https://open.spotify.com/playlist/5kIdbxnvcGIgs1L1Rohvcv?si=3dd09b6325294704', height:352, no:'sp01' },
+        { type:'image', src:'https://i.postimg.cc/j5q96SVt/a75779d0-5966-43f4-81b2-c88d18781ccb.jpg', title:'His journey begins❤️', desc:'Lilli: ', no:'041' },
+        { type:'image', src:'https://i.postimg.cc/ZRYgP5k5/b6cca63c-2eb0-41b1-bb01-932d3fcc5223.jpg', title:'We need to invent this', desc:'Lilli: ', no:'042' },
+        { type:'image', src:'https://i.postimg.cc/zBDMwGm1/ce9be499-f318-408c-85dd-6a13029362f3.jpg', title:'#me', desc:'Lilli: ', no:'044' },
+        { type:'image', src:'https://i.postimg.cc/XJNhK7RT/d9933e5a-2f65-47ba-9d50-ccc919ebdfc9.jpg', title:'Pip and mommy🥹', desc:'Lilli: ', no:'045' },
+        { type:'image', src:'https://i.postimg.cc/yNytSSbw/e20eb0f5-7e45-402e-a4e4-cab779fcfba0.jpg', title:'The way it teleported to my right hand', desc:'Lilli: ', no:'046' },
+        { type:'image', src:'https://i.postimg.cc/FKV8JJB6/e4f9b01f-62ac-4575-8cd7-c2728bd172f8.jpg', title:'Sofuckingscared', desc:'Lilli: ', no:'047' },
+        { type:'image', src:'https://i.postimg.cc/CxCTgtSq/771494284-1570867164589156-1782623075403118158-n.png', title:'Me when u', desc:'Lilli: ', no:'067' },
+        { type:'image', src:'https://i.postimg.cc/ZRVpRmmN/312d90fd-bc21-47ee-99d1-36872db566ca.jpg', title:'I built this for you after you built me the heart lake which was the cutest thing ever❤️❤️', desc:'Lilli: ', no:'085' },
+        { type:'image', src:'https://i.postimg.cc/50nL0JJ1/46eaab3e-7827-4e69-928e-9d5ae3196fe4.jpg', title:'Every day I am more of a believer', desc:'Lilli: ', no:'086' },
+        { type:'image', src:'https://i.postimg.cc/B6hzmfss/f28b7f7f-08a3-4509-a1bd-d7e29e966426.jpg', title:'This is me if you even care', desc:'Lilli: ', no:'048' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/main/Crosby,%20Stills,%20Nash,%20&%20Young%20-%20Our%20House%20(Official%20Video).mp3', poster:'https://i.postimg.cc/MKDW1k0p/ab67616d0000b27306e00756085191abc01e4cf0.jpg', title:'Our House', desc:'', no:'M03' },
+        { type:'image', src:'https://i.postimg.cc/k5nrXcgB/773662292-1577987607066112-3149285478316581369-n.jpg', title:'My prime tbh', desc:'Lilli: ', no:'049' },
+        { type:'image', src:'https://i.postimg.cc/8zdQS3N7/658356527-1465479088410451-2306603005830251740-n.jpg', title:'Love this its so cute', desc:'Lilli: ', no:'050' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/main/6b5f35dc-5507-4861-b0d6-f71fa92175f3.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Me when you', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/KYZXvN8K/771615984-1060520643007324-6737877355132560877-n.jpg', title:'This I made for the first valentine card I made for you that never arrived😭', desc:'Lilli: ', no:'051' },
+        { type:'image', src:'https://i.postimg.cc/wjY8nHKW/0669372e-104e-4338-a704-02720e820632.jpg', title:'I have competition for being ur fav dog', desc:'Lilli: ', no:'052' },
+        { type:'image', src:'https://i.postimg.cc/x1GD27nH/770975082-1071474608665651-5533792509036929805-n.jpg', title:'Can we pretend that...', desc:'Lilli: ', no:'054' },
+        { type:'image', src:'https://i.postimg.cc/VkPQ21yH/77854a15-124e-4881-8252-33aba81f282a.jpg', title:'Literally us', desc:'Lilli: ', no:'056' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/main/8736f04e-21aa-4446-a1ff-994a8fc73dd8.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Made me smile ear to ear🥹', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/1z9x5H3F/775020434-1014342534755945-1024162445739819320-n.jpg', title:'First ever gift I got from you and I will wforever treasure it', desc:'Lilli: ', no:'057' },
+        { type:'image', src:'https://i.postimg.cc/zGwZrM8K/773155132-1717587349297639-8526613731413094883-n.jpg', title:'Well hurry up', desc:'Lilli: ', no:'058' },
+        { type:'image', src:'https://i.postimg.cc/0y1Rhxg0/a310bbc4-aa6d-45b3-bf5b-47647b5ed2ab.jpg', title:'Truth nuke', desc:'Lilli: ', no:'059' },
+        { type:'image', src:'https://i.postimg.cc/zGwZrM8Z/763514928-1048771794742590-349861277703758354-n.jpg', title:'Magical❤️', desc:'Lilli: ', no:'060' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/main/K3VING%20-%20Without%20You%20(Official%20Music%20Video).mp3', poster:'https://i.postimg.cc/Wbn20Rmb/artworks-ut-JRy-I7Zaydn-Tow-B-6u-Tkg-Q-t500x500.jpg', title:'Without You', desc:'K3VING', no:'M05' },
+        { type:'image', src:'https://i.postimg.cc/fbw4TKRt/772114059-1601435991338923-1416686938145528160-n.jpg', title:'This pic will forever stay in my wallet', desc:'Lilli: ', no:'061' },
+        { type:'image', src:'https://i.postimg.cc/pLMb3xNw/62ac1fcc-d8b6-463b-b9ab-17523695a3c0.jpg', title:'I lied it would be peak if you were there too', desc:'Lilli: ', no:'062' },
+        { type:'image', src:'https://i.postimg.cc/yNVqYP89/773810431-1598867091826121-7751440340739115966-n.jpg', title:'Fat little chud', desc:'Lilli: ', no:'063' },
+        { type:'image', src:'https://i.postimg.cc/pTqzTvvP/1b6bd412-38a1-43a0-824a-e88796818839.jpg', title:'Indeed he is', desc:'Lilli: ', no:'083' },
+        { type:'image', src:'https://i.postimg.cc/FRD3RvvJ/3048a636-0c2c-472f-94ed-b87a55ac36aa.jpg', title:'Only the best for you', desc:'Lilli: ', no:'084' },
+        { type:'image', src:'https://i.postimg.cc/2yyvLtjh/4758264b-af16-45fe-b8ba-ca47958bf07e.jpg', title:'What happened:(', desc:'Lilli: ', no:'087' },
+        { type:'image', src:'https://i.postimg.cc/L55fgW4f/7bcabc2a-2519-4d91-b727-88a2d4047389.jpg', title:'Still have ptsd from this game...', desc:'Lilli: ', no:'088' },
+        { type:'image', src:'https://i.postimg.cc/9MJZM22W/c4ff470d-92e0-4845-9ae3-0f9f7e03089b.jpg', title:'Me and fine shyt I pulled by being autistic', desc:'Lilli: ', no:'089' },
+        { type:'image', src:'https://i.postimg.cc/ydvcdKKd/cb6f0138-4527-4106-95cd-c72a60230f28.jpg', title:'Oh me oh my :O', desc:'Lilli: ', no:'090' },
+        { type:'image', src:'https://i.postimg.cc/kgN3mZq5/649378905-1949408399034997-1139574717512906062-n.jpg', title:'Save that saliva for me', desc:'Lilli: ', no:'064' },
+        { type:'image', src:'https://i.postimg.cc/VNqCg8xV/773667463-959274383238679-222936786457816997-n.jpg', title:'Us❤️', desc:'Lilli: ', no:'079' },
+        { type:'image', src:'https://i.postimg.cc/vmFn5BKd/541736468-1150449840272535-6774625402537524742-n.jpg', title:'Us too❤️ ', desc:'Lilli: ', no:'080' },
+        { type:'image', src:'https://i.postimg.cc/N06HDc3n/772655606-1414368327257256-7097632574449432205-n.jpg', title:'No comment', desc:'Lilli: ', no:'081' },
+        { type:'image', src:'https://i.postimg.cc/VNqCg8xH/771820558-1058859376842794-8163237894792579967-n.jpg', title:'This is my motto', desc:'Lilli: ', no:'082' },
+        { type:'image', src:'https://i.postimg.cc/7Z18kcwy/743294438-1521840779434440-6606983280450609077-n.jpg', title:'Sun if it was a person', desc:'Lilli: ', no:'065' },
+        { type:'image', src:'https://i.postimg.cc/P5bsjcTh/772583135-896373723157214-8717099502099087138-n.jpg', title:'I can feel it kicking🥹', desc:'Lilli: ', no:'066' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/main/King%20Krule%20-%20Seaforth.mp3', poster:'https://i.postimg.cc/jdXsyV6j/a2737501365-10.jpg', title:'Seaforth', desc:'', no:'M04' },
+        { type:'image', src:'https://i.postimg.cc/636SV5kg/80bcba14-33ae-411e-b252-7ad1b91d25d3.jpg', title:'Objectively cutest picture oat no discussion', desc:'Lilli: ', no:'038' },
+        { type:'image', src:'https://i.postimg.cc/52WdD1cs/567a639b-3832-4bac-87e5-c64ddf396a41.jpg', title:' All those money changed you...', desc:'Lilli: ', no:'068' },
+        { type:'image', src:'https://i.postimg.cc/K87S2Vx7/778048477-1493985459151786-8001203121536772041-n.jpg', title:'Me if I was sombr fan', desc:'Lilli: ', no:'069' },
+        { type:'image', src:'https://i.postimg.cc/rw2X7c6v/1a12e803-cba1-47d5-84e2-2e9058c76129.jpg', title:'You da real art', desc:'Lilli: ', no:'070' },
+        { type:'image', src:'https://i.postimg.cc/wv7SzdCc/768999728-1077552834666763-6213401690617755575-n.jpg', title:'My beautiful wife', desc:'Lilli: ', no:'050' },
+        { type:'image', src:'https://i.postimg.cc/Nj8qcVB2/660648768-2389891244818884-231187623304153634-n.jpg', title:'4 hectoliters.', desc:'Lilli: ', no:'071' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/main/fa2c3020-92d9-4568-9979-f85ea152d718.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Me when your bazongas', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/CxpT9Yy2/fa9bb6bb-3ff2-471e-a433-7ead43ecaa33.jpg', title:'Ur so cute here im melting', desc:'Lilli: ', no:'072' },
+        { type:'image', src:'https://i.postimg.cc/qvHVW0fW/686db01c-b6ea-4fda-8b77-dd682a23953a.jpg', title:'Marriage speedrun', desc:'Lilli: ', no:'073' },
+        { type:'image', src:'https://i.postimg.cc/k4fK4CCC/f8182b7d-b2e5-4724-98c4-315787a2c95e.jpg', title:'WAIT ON WHOS PHONE WAS THIS TAKEN', desc:'Lilli: ', no:'091' },
+        { type:'image', src:'https://i.postimg.cc/htRWNgFM/5fb741ba-8c62-4f27-821c-35e41ecf73cc.jpg', title:'I still stand by this statement.', desc:'Lilli: ', no:'074' },
+        { type:'image', src:'https://i.postimg.cc/MGWkKDpQ/770608733-1534289514567661-7719728893417540091-n.jpg', title:'Hardware on my head', desc:'Lilli: ', no:'075' },
+        { type:'image', src:'https://i.postimg.cc/SxLFh5ks/774895191-1043613401411938-3095581825134086899-n.jpg', title:'Okay icl now I dont really see the resemblance but back then I could SWEAR this looks exactly like you😭', desc:'Lilli: ', no:'076' },
+        { type:'image', src:'https://i.postimg.cc/Mp02S4qz/770830756-1948528355827513-5648830472958212228-n.jpg', title:'I want to do this again sometime', desc:'Lilli: ', no:'077' },
+        { type:'image', src:'https://i.postimg.cc/L8kKp724/774664988-1547886706325438-960612234549872923-n.jpg', title:'2 goats spotted', desc:'Lilli: ', no:'078' },
+      ]
+    },
+    'archive': {
+      title: 'Our <em>Memories</em>', sub: '',
+      cover: 'https://i.postimg.cc/DyWWp3ZR/770354228-1965089347540254-5145205485420878225-n.jpg', // <- change this URL to pick this board's cover photo on the Introduction page
+      items: [
+        { type:'note', title:'Your art', desc:'You seriously have no idea how much every single drawing you make for me means. I could stare at them for hours and I would still feel like I didnt give them enough appreciation. I hope you will continue making stunning art, not just for me, but any at all, and eventually reach your dream of being a childrens book illustrator <3', no:'n-archive' },
+        { type:'image', src:'https://i.postimg.cc/WbDDYczs/768762912-830458063392549-3516515468217117848-n.jpg', title:'I never said that.', desc:'Lilli: ', no:'A01' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/main/snaptik_7663917205049904416_hd.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Birthday drawing <3', desc:'Simon: Remember seeing this after finally coming home from cinema, being tired asf and this made me so so happy you cant even imagine\nLilli: ', no:'0A4' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-1/snaptik_7624894384592391457_hd.mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'You da real bomb', desc:'Lilli: ', no:'0A4' },
+        { type:'image', src:'https://i.postimg.cc/bvdNrQnj/768397534-27551181851220190-7640135801142177147-n.jpg', title:'So fucking tuff', desc:'Lilli: ', no:'A02' },
+        { type:'image', src:'https://i.postimg.cc/7YCCtrh4/771572549-1301037388584434-4534790664346642985-n.jpg', title:'This gave me boner when I first saw it', desc:'Lilli: ', no:'A03' },
+        { type:'sticker', src:'https://i.postimg.cc/K81yh3YG/6a7415b04fe4e9e36c987ba7c5d8c06c.jpg', title:'', desc:'', no:'S01', size: 130 },
+        { type:'gif', src:'https://media1.tenor.com/m/btYkcmAPyCcAAAAd/cat-flabbergasted.gif', title:'Me every time I see ur art', desc:'', no:'005' },
+        { type:'image', src:'https://i.postimg.cc/LXpkDHv3/777438053-1619839756413261-142267082800239924-n.jpg', title:'ANOTHER BDAY DRAWING???(technically) You need to chill out I did NOT see this coming but I love it so much😭❤️', desc:'Lilli: ', no:'A01' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-1/snaptik_7636754316157635872_hd%20(1).mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Another banger from you', desc:'Simon: At the time you were drawing this I seen you listening to wifiskeleton all over again and was worried youre sad so then I was really relieved it was becasue of this XD\nLilli: ', no:'0A4' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-1/forwards%20beckon%20rebound%20%20best%20part%20loop.mp3', poster:'https://i.postimg.cc/Fss8bXyS/25164c7e29a680c6c79e83603ad4dc7a.jpg', title:'Forward beckon rebound', desc:'', no:'M03' },
+        { type:'gif', src:'https://media1.tenor.com/m/eTwNkgef8voAAAAd/one-piece-ai.gif', title:'You fr', desc:'', no:'005' },
+        { type:'sticker', src:'https://i.postimg.cc/3JJkp1tn/48ba85cb5dcdae1cf6a56ecf0e95be8d.jpg', title:'', desc:'', no:'S01', size: 130 },
+        { type:'image', src:'https://i.postimg.cc/6577bxqw/766072511-1365598495084132-1107194216986023280-n.jpg', title:'Truly a masterpiece.', desc:'Simon: Belongs in a Louvre\nLilli: ', no:'A05' },
+        { type:'image', src:'https://i.postimg.cc/Mps3Tj6H/776681898-1731972391422103-5437500562753199703-n.jpg', title:'SECOND BIRTHDAY THIS TIME PAINTING🥹', desc:'Im glad I convinced you to give it to me because omg this is getting framed\nLilli: ', no:'A08' },
+        { type:'image', src:'https://i.postimg.cc/tC11vGJH/658243252-940953958540309-5985010034583667766-n.jpg', title:'First time I was considering cracking myself', desc:'Lilli: ', no:'A07' },
+        { type:'image', src:'https://i.postimg.cc/yYJJpCxH/638961868-2134907717269965-5865930984302525193-n.jpg', title:'I love this one so so much', desc:'Simon: Was even considering putting it as my pfp XD\nLilli: ', no:'A08' },
+        { type:'video', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-1/snaptik_7638031805903277345_hd%20(1)%20(1).mp4', poster:'https://picsum.photos/seed/board-vid1/500/420', title:'Still mad this didnt blow up on tt >:(', desc:'Lilli: ', no:'0A9' },
+        { type:'image', src:'https://i.postimg.cc/nhpsSMPT/658188628-1481028173812510-7081784203289952137-n.jpg', title:'Rawr', desc:'Lilli: ', no:'A01' },
+        { type:'image', src:'https://i.postimg.cc/DyWWp3ZR/770354228-1965089347540254-5145205485420878225-n.jpg', title:'The one that started it all...', desc:'Simon: On the day you sent me this we became official so to me this will forever be the most precious drawing from you <3\nLilli: ', no:'A08' },
+        
+      ]
+    },
+    'reference': {
+      title: 'Our <em>Memories</em>', sub: '',
+      cover: 'https://i.postimg.cc/9FS8G58Y/721189223-892096927247768-1215191616553088771-n.jpg', // <- change this URL to pick this board's cover photo on the Introduction page
+      items: [
+        { type:'note', title:'My works', desc:'I cant draw very well and Im for sure not as creative as you but I still want to make something nice for you like you do all the time for me, so I figured I could try doing something in 3d which I do already have some experience with and tbh I started to really love doing these. They capture the moments we didnt capture on camera, or they capture them from a different perspective. There is not much of them yet but there will be more eventually trust.', no:'n-reference' },
+        { type:'image', src:'https://i.postimg.cc/5NG7wd7g/770543438-1712670443282501-2778100397604864441-n.jpg', title:'Us in front of our house :O', desc:'Simon: I miss playing there a lot\nLilli: ', no:'R03' },
+        { type:'sticker', src:'https://i.postimg.cc/nr1NcjVs/cbcb6c3b6d50fda7632199bae99c73cd.jpg', title:'', desc:'', no:'S01', size: 140 },
+        { type:'image', src:'https://i.postimg.cc/5NjKYN3R/721800975-1475075890589937-1667577040997262939-n.jpg', title:'Us in our hotel room in Krakow :)', desc:'Simon: That room sure has stories to tell...\nLilli: ', no:'R03' },
+        { type:'audio', src:'https://github.com/Koku204/Library/raw/refs/heads/Koku204-patch-1/Minecraft%20Dreiton%20C418%20%20best%20part.mp3', poster:'https://i.postimg.cc/Df1qwSRT/minecraft-steve-in-grass-field-hd-c0tnn1a90t8nbk38-2957149065.jpg', title:'WMinecraft- Dreiton', desc:'', no:'M01' },
+        { type:'image', src:'https://i.postimg.cc/ZK0sBKc8/765897480-2152914415436499-1007496459332313947-n.jpg', title:'Watching a movie on my bed', desc:'Simon: Every time ur laying on me it feels so nice. Now my room feels empty without you tho :(\nLilli: ', no:'R03' },
+        { type:'image', src:'https://i.postimg.cc/9FS8G58Y/721189223-892096927247768-1215191616553088771-n.jpg', title:'Chilling on a hill by the river', desc:'Simon: In that moment I felt like I was in heaven and wanted it to last forever. I miss it every day.\nLilli: ', no:'R03' },
+        { type:'image', src:'https://i.postimg.cc/65SjdJjh/732463593-1512214130650499-1305452582034643914-n.jpg', title:'Our first time at your dorm', desc:'Simon: This one was very hard to recreate because I couldnt capture the feelings I felt during that time\nLilli: ', no:'R03' },
+      ]
+    }
+  };
+
+  const BOARD_ORDER = ['introduction', 'working', 'torun-natalia-poznan', 'krakow', 'random', 'archive', 'reference', 'favorites'];
+  const menuNames = { introduction: 'Introduction', working: 'Trip to Slovakia', 'torun-natalia-poznan': 'Toruń, Natalia, Poznań', krakow: 'Kraków', random: 'Random pics', archive: 'Your art', reference: 'My works', favorites: 'Favorites' };
+  const menuDates = { working: 'July 28th - August 4th', 'torun-natalia-poznan': 'June 26th - 30th', krakow: 'May 31st - June 1st' };
+  const NOTES_KEY = 'contact-sheet-notes-v1';
+  const FAVORITES_KEY = 'contact-sheet-favorites-v1';
+  let currentBoardKey = 'introduction';
+  let currentItems = [];
+
+  // tag every item with the key of the board it actually lives on, so favorited
+  // items can still find their original notes/board once they're shown on the
+  // separate Favorites board.
+  Object.keys(BOARDS).forEach(key => {
+    BOARDS[key].items.forEach(it => { it._board = key; });
+  });
+  function boardKeyFor(item){ return item._board || currentBoardKey; }
+
+  function loadNotes(){ try{ return JSON.parse(localStorage.getItem(NOTES_KEY)) || {}; } catch(e){ return {}; } }
+  function saveNote(boardKey, no, title, desc){
+    const notes = loadNotes();
+    notes[boardKey + '__' + no] = { title, desc };
+    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+  }
+  function getNote(boardKey, item){
+    const notes = loadNotes();
+    const o = notes[boardKey + '__' + item.no];
+    return { title: o ? o.title : item.title, desc: o ? o.desc : item.desc };
+  }
+
+  // ---------- favorites ----------
+  const FAVORITABLE_TYPES = ['image', 'video', 'gif'];
+  function isFavoritable(item){ return FAVORITABLE_TYPES.indexOf(item.type) !== -1; }
+  function loadFavorites(){ try{ return JSON.parse(localStorage.getItem(FAVORITES_KEY)) || {}; } catch(e){ return {}; } }
+  function isFavorite(item){
+    const favs = loadFavorites();
+    return !!favs[boardKeyFor(item) + '__' + item.no];
+  }
+  function toggleFavorite(item){
+    const favs = loadFavorites();
+    const key = boardKeyFor(item) + '__' + item.no;
+    if(favs[key]) delete favs[key]; else favs[key] = true;
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+  }
+  function getFavoriteItems(){
+    const items = [];
+    BOARD_ORDER.forEach(key => {
+      if(key === 'favorites') return;
+      const b = BOARDS[key];
+      if(!b) return;
+      b.items.forEach(it => { if(isFavoritable(it) && isFavorite(it)) items.push(it); });
+    });
+    return items;
+  }
+
+  // ---------- menu ----------
+  const menuList = document.getElementById('menuList');
+  BOARD_ORDER.forEach((key, i) => {
+    const li = document.createElement('li');
+    li.dataset.board = key;
+    const text = document.createElement('span');
+    text.className = 'menu-text';
+    const label = document.createElement('span');
+    label.className = 'menu-label';
+    label.textContent = menuNames[key];
+    text.appendChild(label);
+    if(menuDates[key]){
+      const date = document.createElement('span');
+      date.className = 'menu-date';
+      date.textContent = menuDates[key];
+      text.appendChild(date);
+    }
+    li.appendChild(text);
+    li.addEventListener('click', () => { renderBoard(key); closeMenu(); });
+    menuList.appendChild(li);
+  });
+
+  const sideMenu = document.getElementById('sideMenu');
+  const menuBackdrop = document.getElementById('menuBackdrop');
+  const burgerBtn = document.getElementById('burgerBtn');
+  const menuClose = document.getElementById('menuClose');
+  function openMenu(){ sideMenu.classList.add('open'); menuBackdrop.classList.add('open'); }
+  function closeMenu(){ sideMenu.classList.remove('open'); menuBackdrop.classList.remove('open'); }
+  burgerBtn.addEventListener('click', openMenu);
+  menuClose.addEventListener('click', closeMenu);
+  menuBackdrop.addEventListener('click', closeMenu);
+
+  // ---------- rendering ----------
+  const grid = document.getElementById('grid');
+  const visibleCount = document.getElementById('visibleCount');
+  const boardTitle = document.getElementById('boardTitle');
+  const boardSub = document.getElementById('boardSub');
+
+  function buildMediaEl(item, forLightbox){
+    if(item.type === 'video'){
+      const v = document.createElement('video');
+      v.src = item.src;
+      if(item.poster) v.poster = item.poster;
+      v.muted = !forLightbox; v.loop = true; v.playsInline = true; v.autoplay = true;
+      if(forLightbox) v.controls = true;
+      return v;
+    }
+    if(item.type === 'audio'){
+      const img = document.createElement('img'); img.src = item.poster; img.alt = item.title; return img;
+    }
+    const img = document.createElement('img'); img.src = item.src; img.loading = (item.type === 'gif' ? 'eager' : 'lazy'); img.alt = item.title; return img;
+  }
+
+  // builds a heart button wired to toggle this item's favorite state; keeps
+  // any other hearts for the same item (grid + lightbox) in sync.
+  function buildHeartBtn(item, className, onToggle){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = className + (isFavorite(item) ? ' active' : '');
+    btn.innerHTML = HEART_ICON;
+    btn.setAttribute('aria-label', 'Toggle favorite');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFavorite(item);
+      const nowActive = isFavorite(item);
+      syncHeartButtons(item, nowActive);
+      if(onToggle) onToggle();
+    });
+    return btn;
+  }
+
+  // keeps every heart button currently on screen for this exact item in sync
+  // (the same photo can appear both on its home board and on Favorites, and
+  // the lightbox has its own heart button too).
+  function syncHeartButtons(item, active){
+    if(lbCurrentItem === item && lbHeartBtn){ lbHeartBtn.classList.toggle('active', active); }
+    document.querySelectorAll('.frame').forEach(frameEl => {
+      const idx = parseInt(frameEl.dataset.index);
+      if(currentItems[idx] === item){
+        const h = frameEl.querySelector('.heart-btn');
+        if(h) h.classList.toggle('active', active);
+      }
+    });
+  }
+
+  function renderBoard(key){
+    currentBoardKey = key;
+    const board = key === 'favorites'
+      ? { title: 'Our <em>Memories</em>', sub: '', items: getFavoriteItems() }
+      : BOARDS[key];
+    currentItems = board.items;
+    boardTitle.innerHTML = board.title;
+    boardSub.innerHTML = board.sub;
+    document.querySelectorAll('#menuList li').forEach(li => li.classList.toggle('active', li.dataset.board === key));
+    document.querySelectorAll('.chip').forEach((c, i) => c.classList.toggle('active', i === 0));
+    const isIntro = key === 'introduction';
+    document.getElementById('filtersRow').style.display = isIntro ? 'none' : '';
+    document.getElementById('sizeRow').style.display = isIntro ? 'none' : '';
+    grid.innerHTML = '';
+    if(key === 'favorites' && board.items.length === 0){
+      const empty = document.createElement('p');
+      empty.style.cssText = 'font-family:\'Caveat\',cursive;font-size:20px;color:var(--ink-dim);text-align:center;margin:30px 12px;';
+      empty.textContent = 'No favorites yet - tap the heart on any picture or video to save it here:)';
+      grid.appendChild(empty);
+    } else {
+      board.items.forEach((item, i) => grid.appendChild(buildFrame(item, i)));
+    }
+    updateCount();
+  }
+
+  // gives each photo/video/gif frame its own subtle, slightly randomized paper tint
+  function randomFrameColors(){
+    const hue = 42 + (Math.random() * 12 - 6);
+    const sat = 58 + (Math.random() * 16 - 8);
+    const light = 88 + (Math.random() * 8 - 4);
+    const paper = `hsl(${hue.toFixed(1)}, ${sat.toFixed(1)}%, ${light.toFixed(1)}%)`;
+    const edge = `hsl(${(hue - 2).toFixed(1)}, ${(sat - 8).toFixed(1)}%, ${(light - 10).toFixed(1)}%)`;
+    return { paper, edge };
+  }
+
+  function buildFrame(item, i){
+    const note = getNote(boardKeyFor(item), item);
+    const frame = document.createElement('div');
+    frame.className = 'frame type-' + item.type;
+    frame.dataset.type = item.type;
+    frame.dataset.index = i;
+    if(item.type === 'sticker' && item.size){ frame.style.setProperty('--sticker-size', item.size + 'px'); }
+    if(item.type === 'image' || item.type === 'video' || item.type === 'gif'){
+      const { paper, edge } = randomFrameColors();
+      frame.style.setProperty('--frame-paper', paper);
+      frame.style.setProperty('--frame-edge', edge);
+    }
+
+    if(item.type === 'note'){
+      frame.appendChild(buildNoteView(item, note));
+      return frame;
+    }
+
+    if(item.type === 'timer'){
+      frame.appendChild(buildTimerCard(item, { sinceDate: item.sinceDate, caption: item.caption }, false));
+      return frame;
+    }
+
+    if(item.type === 'timerpair'){
+      frame.appendChild(buildTimerPair(item));
+      return frame;
+    }
+
+    if(item.type === 'navgrid'){
+      frame.appendChild(buildNavGrid());
+      return frame;
+    }
+
+    if(item.type === 'spotify'){
+      frame.appendChild(buildSpotifyCard(item));
+      return frame;
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'media-wrap';
+    wrap.appendChild(buildMediaEl(item, false));
+    wrap.addEventListener('click', () => openLightbox(i));
+
+    if(isFavoritable(item)){
+      wrap.appendChild(buildHeartBtn(item, 'heart-btn', () => {
+        // if we're currently looking at the Favorites board, un-hearting
+        // should drop the frame out of view right away
+        if(currentBoardKey === 'favorites' && !isFavorite(item)) renderBoard('favorites');
+      }));
+    }
+
+    frame.appendChild(wrap);
+
+    if(item.type !== 'sticker'){
+      const foot = document.createElement('div');
+      foot.className = 'frame-foot';
+      foot.appendChild(buildFootView(item, note));
+      frame.appendChild(foot);
+    }
+
+    if(item.type === 'audio'){
+      const audio = document.createElement('audio');
+      audio.src = item.src; audio.controls = true;
+      frame.appendChild(audio);
+    }
+    return frame;
+  }
+
+  function buildNoteView(item, note){
+    const holder = document.createElement('div');
+    holder.className = 'note-view';
+
+    const titleEl = document.createElement('span');
+    titleEl.className = 'note-title';
+    titleEl.textContent = note.title;
+
+    const textEl = document.createElement('div');
+    textEl.className = 'note-text';
+    textEl.textContent = note.desc || 'Tap the pencil to write something here…';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'note-edit-btn';
+    editBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5l5 5L8 21l-5.5 1L4 16.5z"/><path d="M13 6l5 5"/></svg>';
+    editBtn.addEventListener('click', (e) => { e.stopPropagation(); holder.replaceWith(buildNoteEdit(item, note)); });
+
+    holder.appendChild(titleEl);
+    holder.appendChild(textEl);
+    holder.appendChild(editBtn);
+    return holder;
+  }
+
+  // ---------- "time since" cards (separate, switchable-unit timers) ----------
+  const TIMER_UNITS = [
+    { key: 'months', label: 'Months' },
+    { key: 'days',   label: 'Days'   },
+    { key: 'hours',  label: 'Hours'  }
+  ];
+
+  function monthsElapsed(start, now){
+    let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+    let anchor = new Date(start.getTime());
+    anchor.setMonth(anchor.getMonth() + months);
+    if(anchor > now){ months--; }
+    return Math.max(0, months);
+  }
+
+  function totalsSince(start, now){
+    const msHour = 36e5, msDay = 24 * msHour, msWeek = 7 * msDay;
+    const diff = now - start;
+    return {
+      months: monthsElapsed(start, now),
+      weeks: Math.floor(diff / msWeek),
+      days: Math.floor(diff / msDay),
+      hours: Math.floor(diff / msHour)
+    };
+  }
+
+  function buildTimerCard(item, cfg, compact){
+    const card = document.createElement('div');
+    card.className = 'timer-card' + (compact ? ' compact' : '');
+
+    const caption = document.createElement('span');
+    caption.className = 'timer-caption';
+    caption.textContent = cfg.caption;
+    card.appendChild(caption);
+
+    const display = document.createElement('div');
+    display.className = 'timer-display';
+    const numEl = document.createElement('span');
+    numEl.className = 'timer-num';
+    const unitEl = document.createElement('span');
+    unitEl.className = 'timer-unit';
+    display.appendChild(numEl);
+    display.appendChild(unitEl);
+    card.appendChild(display);
+
+    const picker = document.createElement('div');
+    picker.className = 'timer-picker';
+    card.appendChild(picker);
+
+    let activeUnit = 'days';
+
+    const buttons = {};
+    TIMER_UNITS.forEach(u => {
+      const btn = document.createElement('button');
+      btn.className = 'timer-pill';
+      btn.type = 'button';
+      btn.textContent = u.label;
+      btn.addEventListener('click', () => {
+        activeUnit = u.key;
+        Object.values(buttons).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        update();
+      });
+      picker.appendChild(btn);
+      buttons[u.key] = btn;
+    });
+
+    function update(){
+      buttons[activeUnit] && buttons[activeUnit].classList.add('active');
+      const now = new Date();
+      if(now < cfg.sinceDate){
+        numEl.textContent = '—';
+        unitEl.textContent = 'not yet…';
+        return;
+      }
+      const totals = totalsSince(cfg.sinceDate, now);
+      const val = totals[activeUnit];
+      const unitInfo = TIMER_UNITS.find(u => u.key === activeUnit);
+      numEl.textContent = val;
+      unitEl.textContent = val === 1 ? unitInfo.label.slice(0, -1) : unitInfo.label;
+    }
+
+    update();
+    const intervalId = window.setInterval(update, 60 * 1000);
+    if(window.MutationObserver){
+      const mo = new MutationObserver(() => {
+        if(!document.body.contains(card)){ window.clearInterval(intervalId); mo.disconnect(); }
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+    }
+
+    return card;
+  }
+
+  function buildTimerPair(item){
+    const row = document.createElement('div');
+    row.className = 'timer-pair';
+    item.timers.forEach(cfg => row.appendChild(buildTimerCard(item, cfg, true)));
+    return row;
+  }
+
+  // ---------- nav grid: thumbnail card for each other board, links to it ----------
+  function getBoardThumb(key){
+    if(key === 'favorites'){
+      const favs = getFavoriteItems();
+      if(favs.length) return favs[favs.length - 1].src;
+      return 'https://i.postimg.cc/jSXDyJZx/778935644-1368698294831479-2072250287003611571-n.png';
+    }
+    const board = BOARDS[key];
+    if(!board) return 'https://i.postimg.cc/jSXDyJZx/778935644-1368698294831479-2072250287003611571-n.png' + key + '/200/200';
+    if(board.cover) return board.cover; // explicit cover image set on the board, takes priority
+    const pic = board.items.find(i => i.type === 'image' || i.type === 'gif' || i.type === 'sticker');
+    if(pic) return pic.src;
+    const withPoster = board.items.find(i => (i.type === 'video' || i.type === 'audio') && i.poster);
+    if(withPoster) return withPoster.poster;
+    return 'https://i.postimg.cc/jSXDyJZx/778935644-1368698294831479-2072250287003611571-n.png' + key + '/200/200';
+  }
+
+  function buildNavGrid(){
+    const wrap = document.createElement('div');
+    wrap.className = 'nav-grid-card';
+
+    const caption = document.createElement('span');
+    caption.className = 'timer-caption';
+    caption.textContent = 'Explore our boards';
+    wrap.appendChild(caption);
+
+    const grid = document.createElement('div');
+    grid.className = 'nav-grid';
+    wrap.appendChild(grid);
+
+    BOARD_ORDER.filter(key => key !== 'introduction').forEach(key => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'nav-item';
+
+      const img = document.createElement('img');
+      img.src = getBoardThumb(key);
+      img.alt = menuNames[key];
+      img.loading = 'lazy';
+
+      const label = document.createElement('span');
+      label.className = 'nav-item-label';
+      label.textContent = menuNames[key];
+
+      card.appendChild(img);
+      card.appendChild(label);
+      card.addEventListener('click', () => {
+        renderBoard(key);
+        closeMenu();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      grid.appendChild(card);
+    });
+
+    return wrap;
+  }
+
+  // ---------- spotify card: embeds a Spotify playlist/album/track ----------
+  function spotifyEmbedUrl(url){
+    try{
+      const u = new URL(url);
+      let path = u.pathname.replace(/^\/intl-[a-z]{2}(-[A-Z]{2})?\//, '/'); // strip locale prefix if present
+      if(!path.startsWith('/embed/')) path = '/embed' + path;
+      return 'https://open.spotify.com' + path + '?utm_source=generator';
+    } catch(e){
+      return url; // if it's already an embed URL or malformed, use as-is
+    }
+  }
+
+  function buildSpotifyCard(item){
+    const wrap = document.createElement('div');
+    wrap.className = 'spotify-card';
+
+    const iframe = document.createElement('iframe');
+    iframe.className = 'spotify-embed';
+    iframe.src = spotifyEmbedUrl(item.url);
+    iframe.width = '100%';
+    iframe.height = item.height || 352;
+    iframe.frameBorder = '0';
+    iframe.loading = 'lazy';
+    iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+
+    wrap.appendChild(iframe);
+    return wrap;
+  }
+
+  function buildNoteEdit(item, note){
+    const holder = document.createElement('div');
+    holder.className = 'edit-box';
+    holder.addEventListener('click', e => e.stopPropagation());
+
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text'; titleInput.value = note.title; titleInput.placeholder = 'Title';
+    const descInput = document.createElement('textarea');
+    descInput.value = note.desc || ''; descInput.placeholder = 'Write something…';
+
+    const actions = document.createElement('div');
+    actions.className = 'edit-actions';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', () => holder.replaceWith(buildNoteView(item, note)));
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save'; saveBtn.textContent = 'Save';
+    saveBtn.addEventListener('click', () => {
+      const newTitle = titleInput.value.trim() || item.title;
+      const newDesc = descInput.value.trim();
+      saveNote(boardKeyFor(item), item.no, newTitle, newDesc);
+      holder.replaceWith(buildNoteView(item, { title: newTitle, desc: newDesc }));
+    });
+    actions.appendChild(cancelBtn); actions.appendChild(saveBtn);
+
+    holder.appendChild(titleInput); holder.appendChild(descInput); holder.appendChild(actions);
+    return holder;
+  }
+
+  // splits a "Simon: ...\nLilli: ..." description into its two parts.
+  // items without that structure (audio, notes, plain legacy text) come back as { simon: desc, lilli: '' }.
+  function splitSimonLilli(desc, isDual){
+    if(!isDual) return { simon: desc || '', lilli: '' };
+    const marker = '\nLilli:';
+    const idx = (desc || '').indexOf(marker);
+    if(idx === -1) return { simon: '', lilli: (desc || '').replace(/^Lilli:\s*/, '') };
+    return { simon: desc.slice(0, idx).trim(), lilli: desc.slice(idx + 1).replace(/^Lilli:\s*/, '').trim() };
+  }
+
+  function buildFootView(item, note){
+    const holder = document.createElement('div');
+    const row1 = document.createElement('div');
+    row1.className = 'foot-row';
+    row1.innerHTML = `<span class="cap">${note.title}</span>`;
+
+    const isDual = item.type === 'image' || item.type === 'video';
+    const { simon } = splitSimonLilli(note.desc, isDual);
+    const shownText = isDual ? simon : (note.desc || '');
+
+    const row2 = document.createElement('div');
+    row2.className = 'desc-row';
+    const descEl = document.createElement('span');
+    descEl.className = 'desc' + (shownText ? '' : ' empty');
+    descEl.textContent = shownText || 'add a description…';
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn'; editBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5l5 5L8 21l-5.5 1L4 16.5z"/><path d="M13 6l5 5"/></svg>';
+    editBtn.addEventListener('click', (e) => { e.stopPropagation(); holder.replaceWith(buildFootEdit(item, note)); });
+    row2.appendChild(descEl); row2.appendChild(editBtn);
+
+    holder.appendChild(row1); holder.appendChild(row2);
+    return holder;
+  }
+
+  function buildFootEdit(item, note){
+    const holder = document.createElement('div');
+    holder.className = 'edit-box';
+    holder.addEventListener('click', e => e.stopPropagation());
+
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text'; titleInput.value = note.title; titleInput.placeholder = 'Title';
+    const descInput = document.createElement('textarea');
+    descInput.value = note.desc || ''; descInput.placeholder = 'Write a description…';
+
+    const actions = document.createElement('div');
+    actions.className = 'edit-actions';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', () => holder.replaceWith(buildFootView(item, note)));
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save'; saveBtn.textContent = 'Save';
+    saveBtn.addEventListener('click', () => {
+      const newTitle = titleInput.value.trim() || item.title;
+      const newDesc = descInput.value.trim();
+      saveNote(boardKeyFor(item), item.no, newTitle, newDesc);
+      holder.replaceWith(buildFootView(item, { title: newTitle, desc: newDesc }));
+    });
+    actions.appendChild(cancelBtn); actions.appendChild(saveBtn);
+
+    holder.appendChild(titleInput); holder.appendChild(descInput); holder.appendChild(actions);
+    return holder;
+  }
+
+  function updateCount(){
+    const shown = document.querySelectorAll('.frame:not(.hidden)').length;
+    visibleCount.textContent = `${shown} frame${shown === 1 ? '' : 's'}`;
+  }
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const f = chip.dataset.filter;
+      document.querySelectorAll('.frame').forEach(el => el.classList.toggle('hidden', !(f === 'all' || el.dataset.type === f)));
+      updateCount();
+    });
+  });
+
+  // ---------- size row (photo template picker) ----------
+  const gridEl = document.getElementById('grid');
+  document.querySelectorAll('.size-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.size-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      gridEl.classList.toggle('size-4', chip.dataset.size === '4');
+      if(chip.dataset.size === '4') openHint();
+    });
+  });
+
+  // ---------- 4-up screen-size hint ----------
+  const hintBackdrop = document.getElementById('hintBackdrop');
+  const hintCard = document.getElementById('hintCard');
+  const hintClose = document.getElementById('hintClose');
+  function openHint(){ hintBackdrop.classList.add('open'); hintCard.classList.add('open'); }
+  function closeHint(){ hintBackdrop.classList.remove('open'); hintCard.classList.remove('open'); }
+  hintClose.addEventListener('click', closeHint);
+  hintBackdrop.addEventListener('click', closeHint);
+
+  // ---------- lightbox ----------
+  const lightbox = document.getElementById('lightbox');
+  const lbMediaBox = document.getElementById('lbMediaBox');
+  const lbTitle = document.getElementById('lbTitle');
+  const lbDesc = document.getElementById('lbDesc');
+  let currentIndex = 0;
+  let lbCurrentItem = null;
+  let lbHeartBtn = null;
+
+  function visibleIndices(){
+    return Array.from(document.querySelectorAll('.frame'))
+      .filter(el => !el.classList.contains('hidden'))
+      .map(el => parseInt(el.dataset.index))
+      .filter(idx => currentItems[idx] && currentItems[idx].type !== 'sticker');
+  }
+  function openLightbox(index){ currentIndex = index; renderLightbox(); lightbox.classList.add('open'); }
+
+  function renderLightbox(){
+    const item = currentItems[currentIndex];
+    const note = getNote(boardKeyFor(item), item);
+    lbCurrentItem = item;
+    lbHeartBtn = null;
+    lbMediaBox.innerHTML = '';
+    lbMediaBox.className = 'lb-media-box' + (item.type === 'audio' ? ' audio-box' : '');
+    const stray = document.querySelector('.lb-audio'); if(stray) stray.remove();
+
+    if(item.type === 'audio'){
+      const img = document.createElement('img'); img.src = item.poster; lbMediaBox.appendChild(img);
+      const audio = document.createElement('audio');
+      audio.className = 'lb-audio'; audio.src = item.src; audio.controls = true; audio.autoplay = true;
+      lbMediaBox.insertAdjacentElement('afterend', audio);
+    } else {
+      lbMediaBox.appendChild(buildMediaEl(item, true));
+    }
+
+    if(isFavoritable(item)){
+      lbHeartBtn = buildHeartBtn(item, 'lb-heart-btn', () => {
+        if(currentBoardKey === 'favorites' && !isFavorite(item)) renderBoard('favorites');
+      });
+      lbMediaBox.appendChild(lbHeartBtn);
+    }
+    lbTitle.textContent = note.title;
+    lbDesc.innerHTML = '';
+    const isDual = item.type === 'image' || item.type === 'video';
+    const { simon, lilli } = splitSimonLilli(note.desc, isDual);
+    if(simon){
+      const s = document.createElement('div');
+      s.className = 'desc-part desc-simon';
+      s.textContent = simon;
+      lbDesc.appendChild(s);
+    }
+    if(isDual){
+      if(simon){
+        const divider = document.createElement('div');
+        divider.className = 'desc-divider';
+        lbDesc.appendChild(divider);
+      }
+      const l = document.createElement('div');
+      l.className = 'desc-part desc-lilli';
+      l.textContent = lilli ? `Lilli: ${lilli}` : 'Lilli: ';
+      lbDesc.appendChild(l);
+    }
+  }
+
+  function step(dir){
+    const order = visibleIndices();
+    if(order.length === 0 || lbAnimating) return;
+    let pos = order.indexOf(currentIndex); if(pos === -1) pos = 0;
+    pos = (pos + dir + order.length) % order.length;
+    currentIndex = order[pos];
+    animateStep(dir);
+  }
+
+  let lbAnimating = false;
+  function animateStep(dir){
+    lbAnimating = true;
+    const outClass = dir > 0 ? 'slide-out-left' : 'slide-out-right';
+    const inClass = dir > 0 ? 'slide-in-right' : 'slide-in-left';
+    lbMediaBox.classList.add(outClass);
+    window.setTimeout(() => {
+      renderLightbox();
+      lbMediaBox.classList.add(inClass);
+      void lbMediaBox.offsetWidth; // force reflow so the entrance transition plays
+      lbMediaBox.classList.remove(inClass);
+      window.setTimeout(() => { lbAnimating = false; }, 220);
+    }, 220);
+  }
+
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if(e.target === lightbox) closeLightbox(); });
+
+  // ---------- swipe to browse ----------
+  let swipeStartX = 0, swipeStartY = 0, swipeActive = false;
+  lightbox.addEventListener('touchstart', (e) => {
+    if(e.touches.length !== 1) return;
+    swipeStartX = e.touches[0].clientX;
+    swipeStartY = e.touches[0].clientY;
+    swipeActive = true;
+  }, { passive: true });
+  lightbox.addEventListener('touchend', (e) => {
+    if(!swipeActive) return;
+    swipeActive = false;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - swipeStartX;
+    const dy = touch.clientY - swipeStartY;
+    if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4){
+      step(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  function closeLightbox(){
+    lightbox.classList.remove('open');
+    lbMediaBox.innerHTML = '';
+    const stray = document.querySelector('.lb-audio'); if(stray) stray.remove();
+  }
+
+  renderBoard('introduction');
+</script>
+
+</body>
+</html>
